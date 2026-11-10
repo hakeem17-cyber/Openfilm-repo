@@ -6,187 +6,217 @@
 <style>
   @font-face { font-family: "SH Display"; src: url("assets/fonts/InterDisplay-Black.otf"); font-weight: 900; }
   @font-face { font-family: "SH Light"; src: url("assets/fonts/Inter-ExtraLight.otf"); font-weight: 200; }
-  :root { --gold-1: #fff3d1; --gold-2: #f1c56b; --gold-3: #b9852f; --gold-4: #6e4a17; }
-  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #050404; }
-  #stage { position: absolute; inset: 0; overflow: hidden;
-    background: radial-gradient(120% 70% at 50% 46%, #1d150c 0%, #0b0806 45%, #030303 100%); }
+  :root { --gold-1: #fff4d6; --gold-2: #f3c86e; --gold-3: #c08a34; --gold-4: #6a4314; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+  #stage { position: absolute; inset: 0; overflow: hidden; background: #000; }
   canvas { position: absolute; inset: 0; width: 1080px; height: 1920px; }
-  #world { position: absolute; inset: 0; transform-origin: 50% 46%; }
-  #beam { position: absolute; left: 538px; top: 0; width: 4px; height: 1920px;
-    background: #fff6dc; box-shadow: 0 0 30px 8px rgba(255,226,160,.8), 0 0 120px 40px rgba(241,197,107,.35);
-    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 46%, transparent);
-    mask-image: linear-gradient(to bottom, transparent 0%, #000 46%, transparent 100%); transform-origin: 50% 46%; }
-  #emblem { position: absolute; left: 340px; top: 420px; width: 400px; height: 400px; }
-  #title { position: absolute; left: 0; right: 0; top: 860px; text-align: center;
-    font-family: "SH Display"; font-weight: 900; font-size: 190px; line-height: .94; letter-spacing: .02em; }
-  #title .line { display: block; white-space: nowrap; }
-  #title .ch { display: inline-block;
-    background-image: linear-gradient(100deg, transparent 0%, transparent 42%, rgba(255,255,255,.95) 50%, transparent 58%, transparent 100%),
-                      linear-gradient(180deg, var(--gold-1) 0%, var(--gold-2) 38%, var(--gold-3) 70%, var(--gold-4) 100%);
-    background-size: 300% 100%, 100% 100%; background-repeat: no-repeat;
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-    filter: drop-shadow(0 6px 30px rgba(241,197,107,.25)); }
-  #rule { position: absolute; top: 1268px; left: 540px; width: 600px; height: 2px; margin-left: -300px;
-    background: linear-gradient(90deg, transparent, var(--gold-2), transparent); }
-  #sub { position: absolute; left: 0; right: 0; top: 1310px; text-align: center; color: var(--gold-1);
-    font-family: "SH Light"; font-weight: 200; font-size: 52px; letter-spacing: .3em; text-indent: .3em; }
-  #sub .ch { display: inline-block; }
-  #flash { position: absolute; inset: 0; background: radial-gradient(60% 40% at 50% 46%, #fff8e6, rgba(255,230,180,.6) 40%, transparent 80%); }
-  #shock { position: absolute; left: 540px; top: 883px; width: 10px; height: 10px; border-radius: 50%;
-    border: 6px solid rgba(255,236,190,.9); box-shadow: 0 0 60px 10px rgba(241,197,107,.6); }
+  #glow { position: absolute; inset: 0; background: radial-gradient(55% 32% at 50% 40%, rgba(120,78,24,.55), rgba(40,24,8,.25) 50%, transparent 80%); }
+  #wordmark { position: absolute; left: 0; right: 0; top: 1150px; text-align: center; white-space: nowrap;
+    font-size: 112px; line-height: 1; letter-spacing: .05em; text-indent: .05em; }
+  #wordmark span { background: linear-gradient(180deg, var(--gold-1) 0%, var(--gold-2) 40%, var(--gold-3) 75%, var(--gold-4) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent; }
+  #wordmark .light { font-family: "SH Light"; font-weight: 200; }
+  #wordmark .bold { font-family: "SH Display"; font-weight: 900; }
+  #edge { position: absolute; top: 1120px; width: 6px; height: 170px; margin-left: -3px; border-radius: 3px;
+    background: #fff8e8; box-shadow: 0 0 24px 6px rgba(255,226,160,.9), 0 0 90px 30px rgba(243,200,110,.45); }
+  #sub { position: absolute; left: 0; right: 0; top: 1306px; text-align: center; color: #e9d3a6;
+    font-family: "SH Light"; font-weight: 200; font-size: 34px; letter-spacing: .9em; text-indent: .9em; }
+  #flare { position: absolute; left: -200px; width: 1480px; top: 748px; height: 24px; margin-top: -12px;
+    background: radial-gradient(50% 50% at 50% 50%, rgba(255,250,235,1), rgba(255,214,140,.55) 25%, rgba(255,190,90,.12) 60%, transparent 100%);
+    mix-blend-mode: screen; }
+  #sheen { position: absolute; left: 0; top: 1100px; width: 260px; height: 280px; mix-blend-mode: overlay;
+    background: linear-gradient(100deg, transparent, rgba(255,255,255,.95), transparent); }
+  #flash { position: absolute; inset: 0; background: radial-gradient(70% 45% at 50% 40%, #fffaf0, rgba(255,226,170,.55) 45%, transparent 85%); }
+  #grain { position: absolute; inset: 0; opacity: .07; mix-blend-mode: screen; }
+  #vignette { position: absolute; inset: 0; background: radial-gradient(85% 60% at 50% 45%, transparent 55%, rgba(0,0,0,.75) 100%); }
   #black { position: absolute; inset: 0; background: #000; }
 </style>
 </head>
 <body>
 <div id="stage">
-  <canvas id="dust" width="1080" height="1920"></canvas>
-  <div id="world">
-    <div id="beam"></div>
-    <svg id="emblem" viewBox="0 0 400 400">
-      <defs>
-        <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#fff3d1"/><stop offset=".45" stop-color="#f1c56b"/><stop offset="1" stop-color="#8a5c1c"/>
-        </linearGradient>
-      </defs>
-      <circle id="ring" cx="200" cy="200" r="180" fill="none" stroke="url(#g)" stroke-width="6" transform="rotate(-90 200 200)"/>
-      <circle id="ring2" cx="200" cy="200" r="158" fill="none" stroke="url(#g)" stroke-width="2" opacity=".6" transform="rotate(90 200 200)"/>
-      <g id="ticks" stroke="url(#g)" stroke-width="3"></g>
-      <text id="mono" x="200" y="248" text-anchor="middle" font-family="SH Display" font-weight="900" font-size="150" fill="url(#g)" letter-spacing="-6">SH</text>
-    </svg>
-    <div id="title"><span class="line">STUDIO</span><span class="line">HAKIM</span></div>
-    <div id="rule"></div>
-    <div id="sub">PRODUCTIONS</div>
-    <div id="shock"></div>
-  </div>
+  <div id="glow"></div>
+  <canvas id="ribbons" width="1080" height="1920"></canvas>
+  <div id="flare"></div>
+  <div id="wordmark"><span class="light">STUDIO</span><span class="bold">HAKIM</span></div>
+  <div id="edge"></div>
+  <div id="sheen"></div>
+  <div id="sub">PRODUCTIONS</div>
   <div id="flash"></div>
+  <canvas id="grain" width="540" height="960"></canvas>
+  <div id="vignette"></div>
   <div id="black"></div>
 </div>
 <script type="module">
 const $ = (s) => document.querySelector(s);
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const prog = (t, a, b) => clamp((t - a) / (b - a));
+const lerp = (a, b, k) => a + (b - a) * k;
 const easeOut = (x) => 1 - Math.pow(1 - x, 3);
 const easeInOut = (x) => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
-const backOut = (x) => { const c = 1.7; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+const expoOut = (x) => x >= 1 ? 1 : 1 - Math.pow(2, -10 * x);
 const hash = (n) => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
 
-const HIT = 2.4; // the impact, in page seconds (matches assets/impact.wav)
+const LOCK = 2.6;            // the ribbons lock into the mark: the hit (assets/hit.wav)
+const CX = 540, CY = 760;    // the mark's center
+const BAR = { w: 92, gap: 112, h: 560 };    // the H: two bars and a crossbar, in px at rest
+const CROSS = { h: 64 };
+const PALETTE = ['#fff4d6', '#ffe1a0', '#f3c86e', '#e0a64a', '#c08a34', '#f2b98c', '#a86d26', '#ffd27a'];
 
-// split words into letters so each can move
-for (const el of document.querySelectorAll('#title .line, #sub')) {
-  el.innerHTML = [...el.textContent].map((c) => `<span class="ch">${c}</span>`).join('');
-}
-const titleChars = [...document.querySelectorAll('#title .ch')];
-const subChars = [...document.querySelectorAll('#sub .ch')];
-
-// film-reel ticks around the emblem
-const ticks = $('#ticks');
-for (let i = 0; i < 24; i++) {
-  const a = (i / 24) * Math.PI * 2, r1 = 166, r2 = i % 6 === 0 ? 146 : 156;
-  const l = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-  l.setAttribute('x1', 200 + Math.cos(a) * r1); l.setAttribute('y1', 200 + Math.sin(a) * r1);
-  l.setAttribute('x2', 200 + Math.cos(a) * r2); l.setAttribute('y2', 200 + Math.sin(a) * r2);
-  ticks.appendChild(l);
-}
-const ticksEls = [...ticks.children];
-const ring = $('#ring'), ring2 = $('#ring2');
-const C1 = 2 * Math.PI * 180, C2 = 2 * Math.PI * 158;
-ring.style.strokeDasharray = C1; ring2.style.strokeDasharray = C2;
-
-// dust motes: fixed seeds, positions are a pure function of t
-const ctx = $('#dust').getContext('2d');
-const motes = Array.from({ length: 140 }, (_, i) => ({
-  x: hash(i) * 1080, y: hash(i + 99) * 1920, r: .6 + hash(i + 7) * 2.6,
-  vx: (hash(i + 3) - .5) * 30, vy: -10 - hash(i + 5) * 40, tw: hash(i + 11) * 6.28, z: hash(i + 13),
-}));
-const sparks = Array.from({ length: 70 }, (_, i) => ({
-  a: hash(i + 500) * 6.283, v: 500 + hash(i + 600) * 1300, r: 1 + hash(i + 700) * 3, life: .6 + hash(i + 800) * 1.2,
-}));
-
-function drawDust(t) {
-  ctx.clearRect(0, 0, 1080, 1920);
-  const boost = t > HIT ? 1 + 2.5 * Math.exp(-(t - HIT) * 2.5) : 1;
-  for (const m of motes) {
-    const push = t > HIT ? (1 - Math.exp(-(t - HIT) * 2)) * 140 * (m.z + .3) : 0;
-    let x = m.x + m.vx * t, y = m.y + m.vy * t;
-    const dx = x - 540, dy = y - 883, d = Math.hypot(dx, dy) || 1;
-    x += dx / d * push; y += dy / d * push;
-    x = ((x % 1080) + 1080) % 1080; y = ((y % 1920) + 1920) % 1920;
-    const a = (.15 + .35 * (.5 + .5 * Math.sin(t * 2 + m.tw))) * m.z * boost * prog(t, 0, .8);
-    ctx.fillStyle = `rgba(255,214,150,${clamp(a)})`;
-    ctx.beginPath(); ctx.arc(x, y, m.r, 0, 6.283); ctx.fill();
+// ribbons: each lives inside a bar of the H; decoys fill the tunnel and fade away
+const ribbons = [];
+for (const side of [-1, 1]) {
+  for (let i = 0; i < 110; i++) {
+    const k = i + (side > 0 ? 1000 : 0);
+    const inner = BAR.gap, outer = BAR.gap + BAR.w;
+    const x0 = side * lerp(inner, outer, hash(k));
+    ribbons.push({ x: x0, w: .8 + hash(k + 1) * 5.5, c: PALETTE[Math.floor(hash(k + 2) * PALETTE.length)],
+      a: .25 + hash(k + 3) * .75, ph: hash(k + 4) * 6.28, sp: .6 + hash(k + 5) * 1.8, decoy: false,
+      h0: -BAR.h / 2, h1: BAR.h / 2, e0: hash(k + 6) * 520, e1: hash(k + 7) * 520 });
   }
-  if (t >= HIT) {
-    const s = t - HIT;
-    for (const p of sparks) {
-      if (s > p.life) continue;
-      const k = s / p.life, dist = p.v * (1 - Math.exp(-s * 3)) / 3;
-      const x = 540 + Math.cos(p.a) * dist, y = 883 + Math.sin(p.a) * dist;
-      ctx.fillStyle = `rgba(255,230,180,${(1 - k) * .95})`;
-      ctx.beginPath(); ctx.arc(x, y, p.r * (1 - k * .5), 0, 6.283); ctx.fill();
+}
+for (let i = 0; i < 180; i++) {
+  const k = 5000 + i;
+  ribbons.push({ x: (hash(k) - .5) * 900, w: .6 + hash(k + 1) * 4, c: PALETTE[Math.floor(hash(k + 2) * PALETTE.length)],
+    a: .15 + hash(k + 3) * .5, ph: hash(k + 4) * 6.28, sp: .5 + hash(k + 5) * 2, decoy: true, h0: -BAR.h / 2, h1: BAR.h / 2, e0: hash(k + 6) * 700, e1: hash(k + 7) * 700 });
+}
+const cross = Array.from({ length: 34 }, (_, i) => ({
+  y: (hash(9000 + i) - .5) * CROSS.h, w: .8 + hash(9100 + i) * 3.5, c: PALETTE[Math.floor(hash(9200 + i) * PALETTE.length)],
+  a: .35 + hash(9300 + i) * .65, d: hash(9400 + i) * .25,
+}));
+
+const ctx = $('#ribbons').getContext('2d');
+
+// camera: starts deep inside the left bar, pulls back to rest by the hit, then a slow push
+function camera(t) {
+  const p = easeInOut(prog(t, 0, LOCK));
+  const zoom = t < LOCK ? Math.exp(Math.log(22) * Math.pow(1 - p, 1.4)) : 1 + .05 * easeInOut(prog(t, LOCK, 8));
+  const camx = t < LOCK ? -(BAR.gap + BAR.w * .55) * Math.pow(1 - p, 1.2) : 0;
+  return { zoom, camx };
+}
+
+function drawMark(t, cam) {
+  ctx.clearRect(0, 0, 1080, 1920);
+  const { zoom, camx } = cam;
+  const X = (x) => CX + (x - camx) * zoom;
+  const Y = (y) => CY + y * zoom;
+  const lock = easeOut(prog(t, LOCK - .05, LOCK + .45));
+
+  // solid gold H behind the ribbons once they lock
+  if (lock > 0) {
+    ctx.save();
+    ctx.globalAlpha = lock;
+    const g = ctx.createLinearGradient(0, Y(-BAR.h / 2), 0, Y(BAR.h / 2));
+    g.addColorStop(0, '#fff0c8'); g.addColorStop(.35, '#f0c063'); g.addColorStop(.7, '#b07a2a'); g.addColorStop(1, '#5e3a10');
+    ctx.fillStyle = g;
+    for (const side of [-1, 1]) {
+      const a = X(side * BAR.gap), b = X(side * (BAR.gap + BAR.w));
+      ctx.fillRect(Math.min(a, b), Y(-BAR.h / 2), Math.abs(b - a), BAR.h * zoom);
+    }
+    ctx.fillRect(X(-BAR.gap), Y(-CROSS.h / 2), (2 * BAR.gap) * zoom, CROSS.h * zoom);
+    // bevel highlights
+    ctx.fillStyle = 'rgba(255,250,235,.55)';
+    for (const side of [-1, 1]) {
+      const a = X(side * BAR.gap), b = X(side * (BAR.gap + BAR.w));
+      ctx.fillRect(Math.min(a, b), Y(-BAR.h / 2), Math.abs(b - a), 3 * zoom);
+      ctx.fillRect(Math.min(a, b), Y(-BAR.h / 2), 2 * zoom, BAR.h * zoom);
+    }
+    ctx.restore();
+  }
+
+  // the ribbons, added light on light
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  const tunnel = 1 - prog(t, 1.2, LOCK - .2);
+  const fade = 1 - .72 * lock;
+  for (const r of ribbons) {
+    let alpha = r.a * fade * (r.decoy ? tunnel : 1);
+    if (alpha < .01) continue;
+    const x = X(r.x), w = Math.max(.6, r.w * Math.min(zoom, 6));
+    if (x + w < -20 || x - w > 1100) continue;
+    // light travels along each ribbon
+    const shimmer = .55 + .45 * Math.sin(t * 3 * r.sp + r.ph);
+    alpha *= shimmer;
+    const ext = 1 - easeInOut(prog(t, .9, LOCK - .05));
+    const y0 = Y(r.h0 - r.e0 * ext), y1 = Y(r.h1 + r.e1 * ext);
+    const g = ctx.createLinearGradient(0, y0, 0, y1);
+    const head = ((t * .45 * r.sp + r.ph) % 1);
+    g.addColorStop(0, 'rgba(0,0,0,0)');
+    g.addColorStop(clamp(head - .25), r.c);
+    g.addColorStop(head, '#ffffff');
+    g.addColorStop(clamp(head + .25), r.c);
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.globalAlpha = clamp(alpha);
+    ctx.fillStyle = g;
+    ctx.fillRect(x - w / 2, y0, w, y1 - y0);
+  }
+  // crossbar: a sheaf of light shoots across just before the lock
+  const sweep = prog(t, 1.75, LOCK);
+  if (sweep > 0) {
+    for (const c of cross) {
+      const k = expoOut(clamp((sweep - c.d) / (1 - c.d)));
+      if (k <= 0) continue;
+      const xa = X(-BAR.gap), xb = X(lerp(-BAR.gap, BAR.gap, k));
+      const y = Y(c.y), h = Math.max(.6, c.w * Math.min(zoom, 4));
+      const g = ctx.createLinearGradient(xa, 0, xb, 0);
+      g.addColorStop(0, c.c); g.addColorStop(.85, c.c); g.addColorStop(1, '#ffffff');
+      ctx.globalAlpha = c.a * fade;
+      ctx.fillStyle = g;
+      ctx.fillRect(xa, y - h / 2, xb - xa, h);
     }
   }
+  ctx.restore();
 }
 
+// film grain: one fixed noise tile, offset per frame (a pure function of t)
+const gctx = $('#grain').getContext('2d');
+const tile = document.createElement('canvas'); tile.width = tile.height = 256;
+{
+  const tc = tile.getContext('2d'), img = tc.createImageData(256, 256);
+  for (let i = 0; i < 256 * 256; i++) { const v = hash(i * 1.37) * 255; img.data.set([v, v, v, 255], i * 4); }
+  tc.putImageData(img, 0, 0);
+}
+function grain(t) {
+  const f = Math.floor(t * 24);
+  gctx.fillStyle = gctx.createPattern(tile, 'repeat');
+  gctx.save(); gctx.translate(-Math.floor(hash(f) * 256), -Math.floor(hash(f + 77) * 256));
+  gctx.fillRect(0, 0, 540 + 256, 960 + 256); gctx.restore();
+}
+
+const word = $('#wordmark'), edge = $('#edge'), sub = $('#sub');
 function frame(t) {
-  drawDust(t);
-  const after = t - HIT;
+  const cam = camera(t);
+  drawMark(t, cam);
+  grain(t);
+  const after = t - LOCK;
 
-  // slow camera push the whole time, a short shake at the hit
-  const shake = after > 0 ? Math.exp(-after * 9) * 14 : 0;
-  const sx = shake * Math.sin(t * 90), sy = shake * Math.cos(t * 77);
-  $('#world').style.transform = `translate(${sx}px, ${sy}px) scale(${1 + .06 * easeInOut(prog(t, 0, 8))})`;
+  $('#glow').style.opacity = .25 + .75 * easeOut(prog(t, LOCK - .2, LOCK + 1));
 
-  // beam of light grows toward the hit, then collapses into the flash
-  const grow = easeInOut(prog(t, .2, HIT));
-  const beam = $('#beam');
-  beam.style.opacity = t < HIT ? .15 + .85 * grow : Math.max(0, 1 - after * 4);
-  beam.style.transform = `scaleY(${.05 + .95 * grow}) scaleX(${1 + 3 * grow})`;
+  // the hit: flash and an anamorphic streak through the mark
+  $('#flash').style.opacity = after < 0 ? 0 : Math.exp(-after * 6) * clamp(after / .03) * .9;
+  const fl = $('#flare');
+  fl.style.opacity = after < 0 ? 0 : clamp(after / .05) * (.25 + .75 * Math.exp(-after * 2.2));
+  fl.style.transform = `scaleX(${after < 0 ? 0 : .6 + .5 * easeOut(clamp(after / .6))}) scaleY(${1 + 2 * Math.exp(-after * 5)})`;
 
-  // emblem: rings draw in before the hit, monogram lands with it
-  const draw = easeInOut(prog(t, .6, HIT));
-  ring.style.strokeDashoffset = C1 * (1 - draw);
-  ring2.style.strokeDashoffset = C2 * (1 - easeInOut(prog(t, 1.0, HIT)));
-  ticksEls.forEach((l, i) => { l.style.opacity = prog(t, 1.2 + i * .04, 1.4 + i * .04); });
-  $('#ticks').setAttribute('transform', `rotate(${t * 6} 200 200)`);
-  const mono = $('#mono'), mk = prog(t, HIT, HIT + .5);
-  mono.style.opacity = mk;
-  mono.setAttribute('transform', `translate(200 200) scale(${1.6 - .6 * easeOut(mk)}) translate(-200 -200)`);
-  $('#emblem').style.opacity = prog(t, .5, 1);
+  // wordmark: revealed left to right behind a moving edge of light, tracking settles
+  const r = easeInOut(prog(t, 3.35, 4.55));
+  word.style.clipPath = `inset(-20px ${100 - r * 100}% -20px 0)`;
+  word.style.letterSpacing = `${.05 + .06 * (1 - easeOut(prog(t, 3.35, 5.2)))}em`;
+  edge.style.left = `${lerp(90, 990, r)}px`;
+  edge.style.opacity = r > 0 && r < 1 ? 1 : Math.max(0, 1 - (t - 4.55) * 4) * (r >= 1 ? 1 : 0);
 
-  // title: letters slam in at the hit, tracking settles, then a sheen sweeps across
-  titleChars.forEach((c, i) => {
-    const k = prog(t, HIT + i * .03, HIT + .55 + i * .03);
-    const e = backOut(k);
-    c.style.opacity = clamp(k * 3);
-    c.style.transform = `translateY(${(1 - e) * 60}px) scale(${1.5 - .5 * e})`;
-    c.style.filter = `blur(${(1 - easeOut(k)) * 18}px) drop-shadow(0 6px 30px rgba(241,197,107,.25))`;
-    const sheen = prog(t, 4.6 + i * .06, 5.9 + i * .06);
-    c.style.backgroundPosition = `${100 - sheen * 100}% 0, 0 0`;
-  });
-  $('#title').style.letterSpacing = `${.02 + .1 * (1 - easeOut(prog(t, HIT, HIT + 1.6)))}em`;
+  // PRODUCTIONS breathes in
+  const s = easeOut(prog(t, 4.3, 5.3));
+  sub.style.opacity = s;
+  sub.style.letterSpacing = `${.9 - .2 * s}em`;
+  sub.style.filter = `blur(${(1 - s) * 6}px)`;
 
-  // divider and PRODUCTIONS
-  $('#rule').style.transform = `scaleX(${easeOut(prog(t, 3.2, 4.0))})`;
-  $('#rule').style.opacity = prog(t, 3.2, 3.4);
-  subChars.forEach((c, i) => {
-    const k = easeOut(prog(t, 3.4 + i * .045, 4.1 + i * .045));
-    c.style.opacity = k;
-    c.style.transform = `translateY(${(1 - k) * 24}px)`;
-    c.style.filter = `blur(${(1 - k) * 8}px)`;
-  });
+  // a final sheen over the wordmark
+  const sh = prog(t, 5.6, 6.6);
+  $('#sheen').style.opacity = sh > 0 && sh < 1 ? 1 : 0;
+  $('#sheen').style.transform = `translateX(${lerp(-300, 1150, easeInOut(sh))}px)`;
 
-  // impact flash and shockwave
-  $('#flash').style.opacity = after < 0 ? 0 : Math.exp(-after * 5) * (after < .04 ? after / .04 : 1);
-  const sh = $('#shock'), sk = prog(t, HIT, HIT + 1.1);
-  sh.style.opacity = after < 0 ? 0 : (1 - sk) * .9;
-  const size = 10 + easeOut(sk) * 2600;
-  sh.style.width = sh.style.height = `${size}px`;
-  sh.style.transform = 'translate(-50%, -50%)';
-  sh.style.borderWidth = `${8 - 6 * sk}px`;
-
-  // fade in from and out to black
-  $('#black').style.opacity = Math.max(1 - prog(t, 0, .5), easeInOut(prog(t, 7.1, 8)));
+  // in from black, out to black
+  $('#black').style.opacity = Math.max(1 - prog(t, 0, .35), easeInOut(prog(t, 7.2, 8)));
 }
 
 window.film = { frame, duration: 8, ready: document.fonts.ready.then(() => Promise.all([...document.fonts].map((f) => f.load()))) };
