@@ -1,0 +1,39 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Title</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+body{background:var(--orange)}
+.wrap{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.over{font-size:30px;padding:10px 22px;margin-bottom:44px}
+h1{margin:0;font-size:190px}
+h2{margin:26px 0 0;font-size:96px;color:var(--charcoal)}
+.yrs{margin-top:54px;display:flex;gap:28px;align-items:center;font-family:var(--fd);font-weight:900;font-size:56px;color:var(--cream)}
+.yrs i{display:block;width:240px;height:10px;background:var(--charcoal);position:relative}
+.yrs i b{position:absolute;inset:0;background:var(--cream);transform-origin:left}
+.band{position:absolute;left:0;right:0;bottom:0;height:26px;background:var(--charcoal)}
+.spark{position:absolute;left:0;right:0;bottom:26px;height:300px;opacity:.22}
+</style></head>
+<body>
+<svg class="spark" viewBox="0 0 1920 300" preserveAspectRatio="none"><polyline id="sp" fill="none" stroke="#3A3B3F" stroke-width="10" stroke-linejoin="round"/></svg>
+<div class="wrap">
+  <span class="tag over" id="a">An income story</span>
+  <h1 class="disp stroke" id="b">Studiohakim</h1>
+  <h2 class="disp" id="c">18 years of income</h2>
+  <div class="yrs" id="d"><span>2008</span><i><b id="bar"></b></i><span id="yr">2008</span></div>
+</div>
+<div class="band"></div>
+<script type="module">
+import {DATA,prog,out3,outBack,inOut,rise,fontsReady} from "./lib.js";
+const $=id=>document.getElementById(id);
+const pts=DATA.map((d,i)=>[i/(DATA.length-1)*1920,300-d[1]/100000*280]);
+window.film={duration:5,ready:fontsReady(),frame(t){
+  rise($("a"),t,.1);
+  const p=outBack(prog(t,.3,1.1));$("b").style.opacity=Math.min(1,p*2);$("b").style.scale=String(.85+.15*p);
+  rise($("c"),t,.7);rise($("d"),t,1.1);
+  const q=inOut(prog(t,1.4,3.6));$("bar").style.scale=`${q} 1`;$("yr").textContent=String(Math.round(2008+18*q));
+  const n=q*(pts.length-1),j=Math.floor(n),f=n-j,ps=pts.slice(0,j+1);
+  if(j+1<pts.length&&f>0)ps.push([pts[j][0]+(pts[j+1][0]-pts[j][0])*f,pts[j][1]+(pts[j+1][1]-pts[j][1])*f]);
+  $("sp").setAttribute("points",ps.map(p=>p.join(",")).join(" "));
+  document.body.style.opacity=1-prog(t,4.6,5);
+}};
+</script></body></html>

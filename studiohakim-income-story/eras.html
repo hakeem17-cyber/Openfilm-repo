@@ -1,0 +1,42 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Four eras</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+body{background:var(--charcoal);color:var(--cream)}
+.head{position:absolute;left:120px;top:96px}
+.head .tag{background:var(--orange);color:#fff;font-size:20px;padding:8px 16px}
+.head h1{margin:22px 0 0;font-size:84px}
+.head h1 em{font-style:normal;color:var(--orange)}
+.eras{position:absolute;left:120px;right:120px;top:320px;display:grid;gap:34px}
+.era{display:grid;grid-template-columns:420px 1fr 200px;gap:30px;align-items:center}
+.era .n{font-family:var(--fd);font-weight:900;font-size:30px;text-transform:uppercase}
+.era .n small{display:block;font-weight:600;font-size:20px;color:#c9c6bf;text-transform:none;margin-top:4px}
+.era .tr{height:64px;background:#4a4b50;border:4px solid var(--cream)}
+.era .tr i{display:block;height:100%;background:var(--grey);transform-origin:left}
+.era.hi .tr i{background:var(--orange)}
+.era .v{font-family:var(--fd);font-weight:900;font-size:56px;text-align:right}
+.era.hi .v{color:var(--orange)}
+.mult{position:absolute;left:120px;right:120px;top:830px;display:flex;align-items:center;gap:40px;border-top:4px solid #5a5b60;padding-top:34px}
+.mult .x{font-size:140px;color:var(--orange);min-width:330px}
+.mult p{margin:0;font-family:var(--fd);font-weight:800;font-size:34px;line-height:1.3}
+.mult p span{color:var(--orange)}
+</style></head>
+<body>
+<div class="head" id="h"><span class="tag">The whole journey</span><h1 class="disp">Four eras, <em>average a year</em></h1></div>
+<div class="mult" id="m"><div class="disp x" id="x">0.0×</div><p>Sales a year in 2024 to 2026 (<span>$88.0K</span>)<br>against 2019 to 2023 (<span>$36.9K</span>)</p></div>
+<div class="eras" id="eras"></div>
+<script type="module">
+import {prog,out3,rise,fontsReady} from "./lib.js";
+const E=[["The base","2008/09 to 2010/11",24.6],["First growth","2011/12 to 2016/17",38.36],["The trough","2017/18 to 2020",23.2],["The break-out","2021 to 2026",67.3]];
+const box=document.getElementById("eras");
+box.innerHTML=E.map((e,i)=>`<div class="era${i===3?" hi":""}"><div class="n">${e[0]}<small>${e[1]}</small></div><div class="tr"><i></i></div><div class="v">$0K</div></div>`).join("");
+const rows=[...box.children];
+window.film={duration:8,ready:fontsReady(),frame(t){
+  rise(document.getElementById("h"),t,.1);
+  rows.forEach((r,i)=>{const a=.6+i*.5;rise(r,t,a);const p=out3(prog(t,a+.2,a+1.4));
+    r.querySelector("i").style.scale=`${p*E[i][2]/70} 1`;r.querySelector(".v").textContent="$"+(E[i][2]*p).toFixed(1)+"K"});
+  rise(document.getElementById("m"),t,3.4);
+  document.getElementById("x").textContent=(2.4*out3(prog(t,3.5,4.8))).toFixed(1)+"×";
+  document.body.style.opacity=1-prog(t,7.55,8);
+}};
+</script></body></html>
