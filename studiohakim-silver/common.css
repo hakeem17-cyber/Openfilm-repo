@@ -1,0 +1,9 @@
+@font-face { font-family: "SH Display"; src: url("assets/fonts/InterDisplay-Black.otf"); font-weight: 900; }
+@font-face { font-family: "SH Light"; src: url("assets/fonts/Inter-ExtraLight.otf"); font-weight: 200; }
+html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+#stage { position: absolute; inset: 0; overflow: hidden; background: #000; }
+canvas.full { position: absolute; inset: 0; width: 1080px; height: 1920px; }
+#grain { position: absolute; inset: 0; width: 1080px; height: 1920px; opacity: .07; mix-blend-mode: screen; }
+#vignette { position: absolute; inset: 0; background: radial-gradient(85% 60% at 50% 45%, transparent 55%, rgba(0,0,0,.75) 100%); }
+#black { position: absolute; inset: 0; background: #000; }
+.center { position: absolute; left: 0; right: 0; text-align: center; white-space: nowrap; }

@@ -1,0 +1,115 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>StudioHakim intro: Trailer</title>
+<link rel="stylesheet" href="common.css">
+<style>
+  #stage { background: #050505; }
+  #leak { position: absolute; inset: 0; mix-blend-mode: screen; }
+  .word { position: absolute; left: 0; right: 0; top: 860px; text-align: center; white-space: nowrap; color: #f4efe6;
+    font-family: "SH Display"; font-weight: 900; font-size: 230px; line-height: 1; letter-spacing: -.01em; opacity: 0; }
+  .num { position: absolute; left: 0; right: 0; top: 1110px; text-align: center; color: #e2a24a;
+    font-family: "SH Light"; font-weight: 200; font-size: 30px; letter-spacing: .6em; text-indent: .6em; opacity: 0; }
+  #logo { position: absolute; inset: 0; }
+  #logo .t { position: absolute; left: 0; right: 0; top: 760px; text-align: center; white-space: nowrap; color: #f4efe6;
+    font-family: "SH Display"; font-weight: 900; font-size: 215px; line-height: .9; letter-spacing: .01em; text-indent: .01em; }
+  #logo .t span { display: block; }
+  #logo .bar { position: absolute; left: 400px; width: 280px; top: 1170px; height: 6px; background: #e2a24a; }
+  #logo .s { position: absolute; left: 0; right: 0; top: 1206px; text-align: center; color: #f4efe6;
+    font-family: "SH Light"; font-weight: 200; font-size: 40px; letter-spacing: .75em; text-indent: .75em; }
+  .slice { position: absolute; inset: 0; }
+  #flash { position: absolute; inset: 0; background: #fff8ee; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="leak"></div>
+  <div class="word">VISION</div><div class="word">CRAFT</div><div class="word">STORY</div><div class="word">CINEMA</div>
+  <div class="num">01</div><div class="num">02</div><div class="num">03</div><div class="num">04</div>
+  <div id="logo">
+    <div class="t"><span>STUDIO</span><span>HAKIM</span></div>
+    <div class="bar"></div>
+    <div class="s">PRODUCTIONS</div>
+  </div>
+  <div id="flash"></div>
+  <canvas id="grain" width="540" height="960"></canvas>
+  <div id="vignette"></div>
+  <div id="black"></div>
+</div>
+<script type="module">
+import { clamp, prog, lerp, easeOut, easeInOut, expoOut, hash, makeGrain, fontsReady } from './common.js';
+const $ = (s) => document.querySelector(s);
+const BEATS = [0.4, 1.0, 1.6, 2.2];   // each word lands on a hit (assets/beat1–4.wav)
+const HIT = 3.6;                      // the logo lands (assets/hit.wav)
+const grain = makeGrain($('#grain'));
+const words = [...document.querySelectorAll('.word')], nums = [...document.querySelectorAll('.num')];
+
+// the logo, cut into horizontal slices that can slide apart
+const logo = $('#logo');
+const N = 14, slices = [];
+const master = logo.innerHTML;
+logo.innerHTML = '';
+for (let i = 0; i < N; i++) {
+  const s = document.createElement('div'); s.className = 'slice'; s.innerHTML = master;
+  const top = 740 + (i / N) * 520, h = 520 / N;
+  s.style.clipPath = `inset(${i === 0 ? 0 : top}px 0 ${i === N - 1 ? 0 : 1920 - top - h - .5}px 0)`;
+  logo.appendChild(s); slices.push(s);
+}
+
+function frame(t) {
+  grain(t);
+  // the words, one per beat
+  let shake = 0, flash = 0;
+  BEATS.forEach((b, i) => {
+    const end = (BEATS[i + 1] ?? 2.8) - .07;
+    const on = t >= b && t < end;
+    const k = expoOut(clamp((t - b) / .25));
+    words[i].style.opacity = on ? 1 : 0;
+    words[i].style.transform = `scale(${1.28 - .28 * k - .03 * prog(t, b + .25, end)})`;
+    words[i].style.letterSpacing = `${-.01 + .04 * (1 - k)}em`;
+    nums[i].style.opacity = on ? easeOut(clamp((t - b - .1) / .2)) : 0;
+    if (t >= b) { shake = Math.max(shake, Math.exp(-(t - b) * 14)); flash = Math.max(flash, Math.exp(-(t - b) * 30)); }
+  });
+  // a light leak sweeps across on each beat
+  const lb = BEATS.filter((b) => t >= b).pop();
+  if (lb !== undefined && t < HIT) {
+    const k = clamp((t - lb) / .6), x = lerp(-30, 130, k);
+    $('#leak').style.background = `radial-gradient(60% 30% at ${x}% 45%, rgba(226,162,74,${.35 * (1 - k)}), transparent 70%)`;
+  } else if (t >= HIT) {
+    const a = .18 + .12 * Math.exp(-(t - HIT) * 2);
+    $('#leak').style.background = `radial-gradient(70% 28% at 50% 50%, rgba(226,162,74,${a}), transparent 75%)`;
+  } else $('#leak').style.background = 'none';
+
+  // the build: the logo flickers in, torn into slices, then snaps together on the hit
+  const build = prog(t, 2.8, HIT);
+  const after = t - HIT;
+  const glitch = t < HIT ? build : Math.exp(-after * 9) * .6;
+  const visible = t >= 2.8 && (t >= HIT || hash(Math.floor(t * 30)) < .35 + .6 * build);
+  logo.style.opacity = visible ? 1 : 0;
+  slices.forEach((s, i) => {
+    const f = Math.floor(t * 24);
+    const off = (hash(i * 13 + f) - .5) * 260 * glitch * (hash(i + f * 7) < .55 ? 1 : .1);
+    s.style.transform = `translateX(${off}px)`;
+    s.style.filter = glitch > .05 ? `drop-shadow(${8 * glitch}px 0 0 rgba(0,200,255,.6)) drop-shadow(${-8 * glitch}px 0 0 rgba(255,120,40,.6))` : 'none';
+  });
+  const land = expoOut(clamp(after / .35));
+  logo.style.transform = t < HIT ? 'scale(1.06)' : `scale(${1.15 - .15 * land + .035 * easeInOut(prog(t, HIT + .4, 8))})`;
+  if (after >= 0) { shake = Math.max(shake, 1.6 * Math.exp(-after * 9)); flash = Math.max(flash, Math.exp(-after * 12)); }
+  for (const s of slices) {
+    const sub = s.querySelector('.s'), bar = s.querySelector('.bar');
+    const k = easeOut(prog(t, HIT + .5, HIT + 1.4));
+    sub.style.opacity = k; sub.style.letterSpacing = `${.95 - .2 * k}em`;
+    bar.style.transform = `scaleX(${expoOut(prog(t, HIT + .25, HIT + .9))})`;
+  }
+
+  const sx = shake * 18 * Math.sin(t * 97), sy = shake * 12 * Math.cos(t * 83);
+  $('#stage').style.transform = `translate(${sx}px, ${sy}px)`;
+  $('#flash').style.opacity = flash * .85;
+  $('#black').style.opacity = Math.max(1 - prog(t, 0, .2) * (t >= BEATS[0] ? 1 : 0), easeInOut(prog(t, 7.2, 8)));
+}
+
+window.film = { frame, duration: 8, ready: fontsReady() };
+</script>
+</body>
+</html>

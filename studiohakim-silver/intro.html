@@ -1,0 +1,181 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>StudioHakim intro: Silver Screen</title>
+<link rel="stylesheet" href="common.css">
+<style>
+  #stage { background: radial-gradient(90% 60% at 50% 55%, #0c1116 0%, #040507 60%, #000 100%); }
+  #title { top: 770px; font-family: "SH Display"; font-weight: 900; font-size: 200px; line-height: .92; letter-spacing: .02em; text-indent: .02em; }
+  #title span { display: block; }
+  .chrome { background-image:
+      linear-gradient(105deg, transparent 0%, transparent 44%, rgba(255,255,255,.95) 50%, transparent 56%, transparent 100%),
+      linear-gradient(180deg, #ffffff 0%, #dfe6ee 28%, #7d8894 47%, #1c2128 51%, #8d99a6 66%, #eef3f8 88%, #b9c3cd 100%);
+    background-size: 300% 100%, 100% 100%; background-repeat: no-repeat;
+    -webkit-background-clip: text; background-clip: text; color: transparent; }
+  #rule { position: absolute; left: 340px; width: 400px; top: 1180px; height: 2px;
+    background: linear-gradient(90deg, transparent, #dfe6ee, transparent); }
+  #sub { top: 1214px; color: #c9d4de; font-family: "SH Light"; font-weight: 200; font-size: 40px; letter-spacing: .75em; text-indent: .75em; }
+  #flare { position: absolute; left: -300px; width: 1680px; top: 950px; height: 30px; margin-top: -15px; mix-blend-mode: screen;
+    background: radial-gradient(50% 50% at 50% 50%, #ffffff, rgba(170,205,255,.55) 25%, rgba(120,170,255,.12) 60%, transparent 100%); }
+  #flash { position: absolute; inset: 0; background: radial-gradient(70% 40% at 50% 50%, #ffffff, rgba(200,220,255,.45) 45%, transparent 85%); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="beams" class="full" width="1080" height="1920"></canvas>
+  <div id="title" class="center"><span class="chrome">STUDIO</span><span class="chrome">HAKIM</span></div>
+  <div id="rule"></div>
+  <div id="sub" class="center">PRODUCTIONS</div>
+  <div id="flare"></div>
+  <div id="flash"></div>
+  <canvas id="grain" width="540" height="960"></canvas>
+  <div id="vignette"></div>
+  <div id="black"></div>
+</div>
+<script type="module">
+import { clamp, prog, lerp, easeOut, easeInOut, expoOut, hash, makeGrain, fontsReady } from './common.js';
+const $ = (s) => document.querySelector(s);
+const HIT = 2.8;            // the beams meet behind the title (assets/hit.wav)
+const TEXT_Y = 950;         // the title's middle
+const grain = makeGrain($('#grain'));
+const ctx = $('#beams').getContext('2d');
+
+// haze: a soft value-noise texture made once, drifted per frame
+const fog = document.createElement('canvas'); fog.width = 270; fog.height = 480;
+{
+  const f = fog.getContext('2d'), img = f.createImageData(270, 480);
+  const n = (x, y) => hash(Math.floor(x) * 57 + Math.floor(y) * 131);
+  const smooth = (x, y) => { const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
+    const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+    return lerp(lerp(n(xi, yi), n(xi + 1, yi), u), lerp(n(xi, yi + 1), n(xi + 1, yi + 1), u), v); };
+  for (let y = 0; y < 480; y++) for (let x = 0; x < 270; x++) {
+    const v = .5 * smooth(x / 40, y / 40) + .3 * smooth(x / 17, y / 17) + .2 * smooth(x / 7, y / 7);
+    img.data.set([255, 255, 255, Math.floor(clamp(v * 1.3 - .15) * 255)], (y * 270 + x) * 4);
+  }
+  f.putImageData(img, 0, 0);
+}
+const layer = document.createElement('canvas'); layer.width = 1080; layer.height = 1920;
+const lctx = layer.getContext('2d');
+const fogFull = document.createElement('canvas'); fogFull.width = 1080; fogFull.height = 1920;
+const fctx = fogFull.getContext('2d');
+
+// a beam: from a source point, toward an angle (0 = straight up), with a spread
+function beam(c, sx, sy, angle, spread, len, alpha, tint) {
+  const a1 = angle - spread, a2 = angle + spread;
+  const g = c.createLinearGradient(sx, sy, sx + Math.sin(angle) * len, sy - Math.cos(angle) * len);
+  g.addColorStop(0, `rgba(${tint},${alpha})`); g.addColorStop(.12, `rgba(${tint},${alpha * .8})`); g.addColorStop(1, `rgba(${tint},0)`);
+  c.fillStyle = g;
+  c.beginPath(); c.moveTo(sx, sy);
+  c.lineTo(sx + Math.sin(a1) * len, sy - Math.cos(a1) * len);
+  c.lineTo(sx + Math.sin(a2) * len, sy - Math.cos(a2) * len);
+  c.closePath(); c.fill();
+  // a hot core
+  c.fillStyle = g; c.globalAlpha = .6;
+  c.beginPath(); c.moveTo(sx, sy);
+  c.lineTo(sx + Math.sin(angle - spread * .25) * len, sy - Math.cos(angle - spread * .25) * len);
+  c.lineTo(sx + Math.sin(angle + spread * .25) * len, sy - Math.cos(angle + spread * .25) * len);
+  c.closePath(); c.fill(); c.globalAlpha = 1;
+}
+
+// the two searching beams, and where they cross the title's line
+function sweepers(t) {
+  const k1 = easeInOut(prog(t, .2, 1.6)), k2 = easeInOut(prog(t, 1.1, 2.5)), conv = easeInOut(prog(t, 2.3, HIT));
+  return [
+    { sx: 180, sy: 2000, angle: lerp(lerp(-.5, .62, k1), Math.atan2(540 - 180, 2000 - TEXT_Y), conv), on: prog(t, .15, .4) },
+    { sx: 900, sy: 2000, angle: lerp(lerp(.55, -.6, k2), Math.atan2(540 - 900, 2000 - TEXT_Y), conv), on: prog(t, 1.05, 1.3) },
+  ];
+}
+const xAt = (b, y) => b.sx + Math.tan(b.angle) * (b.sy - y);
+
+function draw(t) {
+  lctx.globalCompositeOperation = 'source-over';
+  lctx.clearRect(0, 0, 1080, 1920);
+  lctx.globalCompositeOperation = 'lighter';
+  const after = t - HIT;
+  const tint = '210,228,255';
+  const pre = after < 0 ? 1 : Math.exp(-after * 3);
+  for (const b of sweepers(t)) beam(lctx, b.sx, b.sy, b.angle, .09, 2400, .7 * b.on * pre, tint);
+  // after the hit: a fan of searchlights behind the title, swaying slowly
+  if (after > 0) {
+    const fan = easeOut(clamp(after / 1.2));
+    for (let i = 0; i < 5; i++) {
+      const base = (i - 2) * .28, sway = Math.sin(t * .7 + i * 1.7) * .06;
+      beam(lctx, 540 + (i - 2) * 120, 2000, base * fan + sway, .05, 2300, .3 * fan, tint);
+    }
+    // the central burst where the beams met
+    const burst = Math.exp(-after * 2);
+    const g = lctx.createRadialGradient(540, TEXT_Y, 0, 540, TEXT_Y, 700);
+    g.addColorStop(0, `rgba(230,240,255,${.7 * burst})`); g.addColorStop(1, 'rgba(0,0,0,0)');
+    lctx.fillStyle = g; lctx.fillRect(0, 0, 1080, 1920);
+  }
+  // haze breaks the light up
+  lctx.globalCompositeOperation = 'destination-in';
+  lctx.globalAlpha = 1;
+  const dx = (t * 18) % 1080, dy = (t * -10) % 1920;
+  fctx.clearRect(0, 0, 1080, 1920);
+  fctx.fillStyle = 'rgba(255,255,255,.35)'; fctx.fillRect(0, 0, 1080, 1920);   // a floor, so the light never vanishes
+  for (const ox of [-1080, 0]) for (const oy of [-1920, 0]) fctx.drawImage(fog, ox + dx, oy + dy + (dy < 0 ? 1920 : 0), 1080, 1920);
+  lctx.drawImage(fogFull, 0, 0);
+
+  ctx.clearRect(0, 0, 1080, 1920);
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.filter = 'blur(7px)'; ctx.drawImage(layer, 0, 0); ctx.filter = 'none';
+  ctx.globalAlpha = .6; ctx.drawImage(layer, 0, 0); ctx.globalAlpha = 1;
+  // dust caught in the light
+  ctx.fillStyle = '#e8f0ff';
+  for (let i = 0; i < 260; i++) {
+    const x = (hash(i) * 1080 + t * (hash(i + 1) - .5) * 40 + 1080) % 1080;
+    const y = (hash(i + 2) * 1920 - t * (10 + hash(i + 3) * 30) + 1920) % 1920;
+    let lit = 0;
+    for (const b of sweepers(t)) lit = Math.max(lit, b.on * pre * clamp(1 - Math.abs(x - xAt(b, y)) / (Math.tan(.09) * (b.sy - y) + 1)));
+    if (after > 0) lit = Math.max(lit, .35 * easeOut(clamp(after)));
+    if (lit <= .02) continue;
+    ctx.globalAlpha = lit * (.3 + .7 * hash(i + 4));
+    ctx.fillRect(x, y, 1.2 + hash(i + 5) * 1.8, 1.2 + hash(i + 5) * 1.8);
+  }
+  ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+}
+
+const title = $('#title');
+function frame(t) {
+  draw(t);
+  grain(t);
+  const after = t - HIT;
+
+  // before the hit, the title shows only where a beam crosses it; after, it is lit whole
+  if (after < 0) {
+    const layers = sweepers(t).map((b) => {
+      const x = xAt(b, TEXT_Y) / 1080 * 100, w = 13 * b.on;
+      return `linear-gradient(90deg, transparent ${x - w}%, rgba(0,0,0,${.85 * b.on}) ${x}%, transparent ${x + w}%)`;
+    });
+    title.style.webkitMaskImage = title.style.maskImage = layers.join(',');
+  } else {
+    const k = easeOut(clamp(after / .25));
+    title.style.webkitMaskImage = title.style.maskImage = `linear-gradient(#000, #000)`;
+    title.style.opacity = k;
+  }
+  if (after < 0) title.style.opacity = 1;
+  title.style.transform = `scale(${after < 0 ? 1.04 : 1.04 - .04 * easeOut(clamp(after / 1.5)) + .03 * easeInOut(prog(t, HIT + 1.5, 8))})`;
+  // a specular glint travels across the chrome
+  const sh = prog(t, 4.6, 5.8);
+  for (const s of title.querySelectorAll('.chrome')) s.style.backgroundPosition = `${100 - easeInOut(sh) * 100}% 0, 0 0`;
+
+  $('#flash').style.opacity = after < 0 ? 0 : Math.exp(-after * 5) * clamp(after / .03) * .8;
+  const fl = $('#flare');
+  fl.style.opacity = after < 0 ? 0 : .3 + .7 * Math.exp(-after * 2);
+  fl.style.transform = `scaleX(${after < 0 ? 0 : .5 + .5 * expoOut(clamp(after / .5))}) scaleY(${1 + 2 * Math.exp(-after * 4)})`;
+
+  $('#rule').style.transform = `scaleX(${expoOut(prog(t, 3.5, 4.3))})`;
+  const s = easeOut(prog(t, 3.8, 4.8));
+  $('#sub').style.opacity = s;
+  $('#sub').style.filter = `blur(${(1 - s) * 6}px)`;
+  $('#sub').style.letterSpacing = `${.95 - .2 * s}em`;
+
+  $('#black').style.opacity = Math.max(1 - prog(t, 0, .3), easeInOut(prog(t, 7.2, 8)));
+}
+
+window.film = { frame, duration: 8, ready: fontsReady() };
+</script>
+</body>
+</html>

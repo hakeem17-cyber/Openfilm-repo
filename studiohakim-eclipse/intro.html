@@ -1,0 +1,166 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>StudioHakim intro: Eclipse</title>
+<link rel="stylesheet" href="common.css">
+<style>
+  #mono { position: absolute; left: 340px; top: 560px; width: 400px; height: 400px; }
+  #wordmark { top: 1130px; font-size: 104px; line-height: 1; letter-spacing: .06em; text-indent: .06em; }
+  #wordmark .ch { display: inline-block;
+    background: linear-gradient(180deg, #fff4d6 0%, #f3c86e 40%, #c08a34 75%, #6a4314 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent; }
+  #wordmark .light { font-family: "SH Light"; font-weight: 200; }
+  #wordmark .bold { font-family: "SH Display"; font-weight: 900; }
+  #rule { position: absolute; left: 390px; width: 300px; top: 1270px; height: 1px;
+    background: linear-gradient(90deg, transparent, #f3c86e, transparent); }
+  #sub { top: 1300px; color: #e9d3a6; font-family: "SH Light"; font-weight: 200; font-size: 34px; letter-spacing: .9em; text-indent: .9em; }
+  #flash { position: absolute; inset: 0; background: radial-gradient(60% 35% at 50% 40%, #fffaf0, rgba(255,226,170,.5) 45%, transparent 85%); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="sky" class="full" width="1080" height="1920"></canvas>
+  <svg id="mono" viewBox="0 0 400 400">
+    <defs>
+      <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#7a5420"/><stop offset=".5" stop-color="#36230b"/><stop offset="1" stop-color="#140c04"/>
+      </linearGradient>
+      <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#fff0c8"/><stop offset=".5" stop-color="#c08a34" stop-opacity=".2"/><stop offset="1" stop-color="#f3c86e"/>
+      </linearGradient>
+    </defs>
+    <text x="200" y="252" text-anchor="middle" font-family="SH Display" font-weight="900" font-size="170" letter-spacing="-8"
+      fill="url(#g)" stroke="url(#rim)" stroke-width="2.5">SH</text>
+  </svg>
+  <div id="wordmark" class="center"><span class="light">STUDIO</span><span class="bold">HAKIM</span></div>
+  <div id="rule"></div>
+  <div id="sub" class="center">PRODUCTIONS</div>
+  <div id="flash"></div>
+  <canvas id="grain" width="540" height="960"></canvas>
+  <div id="vignette"></div>
+  <div id="black"></div>
+</div>
+<script type="module">
+import { clamp, prog, lerp, easeOut, easeInOut, expoOut, hash, makeGrain, fontsReady } from './common.js';
+const $ = (s) => document.querySelector(s);
+const HIT = 2.2;                      // the corona closes into a full ring (assets/hit.wav)
+const CX = 540, CY = 760, R = 230;    // the eclipse
+
+for (const el of document.querySelectorAll('#wordmark span')) {
+  el.innerHTML = [...el.textContent].map((c) => `<span class="ch">${c}</span>`).join('');
+}
+const chars = [...document.querySelectorAll('#wordmark .ch')];
+const grain = makeGrain($('#grain'));
+const ctx = $('#sky').getContext('2d');
+
+const stars = Array.from({ length: 220 }, (_, i) => ({ x: hash(i) * 1080, y: hash(i + 50) * 1920, r: .4 + hash(i + 9) * 1.4, tw: hash(i + 3) * 6.28 }));
+const rays = Array.from({ length: 520 }, (_, i) => ({
+  a: (i / 520) * Math.PI * 2 + hash(i + 300) * .02, len: 30 + Math.pow(hash(i + 400), 3) * 380,
+  w: .6 + hash(i + 500) * 2.2, ph: hash(i + 600) * 6.28, sp: .4 + hash(i + 700) * 1.4,
+}));
+// how much of the rim is lit, by angle: a crescent opening from the upper right
+const START = -Math.PI * .28;
+function rimLight(a, open) {
+  let d = Math.abs(((a - START + Math.PI * 3) % (Math.PI * 2)) - Math.PI); // 0 at START, π opposite
+  const edge = open * Math.PI;
+  return clamp((edge - d) / .35);
+}
+
+function sky(t, zoom) {
+  ctx.clearRect(0, 0, 1080, 1920);
+  // deep space
+  const bg = ctx.createRadialGradient(CX, CY, 0, CX, CY, 1300);
+  bg.addColorStop(0, '#120c06'); bg.addColorStop(.5, '#060403'); bg.addColorStop(1, '#000');
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, 1080, 1920);
+  for (const s of stars) {
+    ctx.globalAlpha = (.25 + .35 * Math.sin(t * 1.5 + s.tw)) * prog(t, 0, 1);
+    ctx.fillStyle = '#f5e7cc'; ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.283); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  ctx.save();
+  ctx.translate(CX, CY); ctx.scale(zoom, zoom);
+  const open = t < HIT ? easeInOut(prog(t, .25, HIT)) : 1;
+  const after = Math.max(0, t - HIT);
+  const blaze = t < HIT ? .5 + .5 * open : 1 + 1.4 * Math.exp(-after * 2.4);
+  const settle = easeOut(prog(t, HIT + .3, HIT + 2.2));     // the rays calm to a fine corona
+  // soft halo
+  const halo = ctx.createRadialGradient(0, 0, R * .9, 0, 0, R * 2.6);
+  halo.addColorStop(0, `rgba(255,210,130,${.55 * open * Math.min(1.4, blaze)})`);
+  halo.addColorStop(.3, `rgba(200,130,50,${.18 * open})`);
+  halo.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = halo; ctx.beginPath(); ctx.arc(0, 0, R * 2.6, 0, 6.283); ctx.fill();
+  // corona rays
+  ctx.globalCompositeOperation = 'lighter';
+  for (const r of rays) {
+    const lit = rimLight(r.a, open);
+    if (lit <= 0) continue;
+    const flick = .6 + .4 * Math.sin(t * 2.2 * r.sp + r.ph);
+    const len = r.len * flick * lerp(1, .45, settle) * (t < HIT ? 1 : 1 + .5 * Math.exp(-after * 3));
+    const c = Math.cos(r.a), s = Math.sin(r.a);
+    const g = ctx.createLinearGradient(c * R, s * R, c * (R + len), s * (R + len));
+    g.addColorStop(0, `rgba(255,236,190,${.5 * lit * blaze})`);
+    g.addColorStop(1, 'rgba(255,170,60,0)');
+    ctx.strokeStyle = g; ctx.lineWidth = r.w;
+    ctx.beginPath(); ctx.moveTo(c * R, s * R); ctx.lineTo(c * (R + len), s * (R + len)); ctx.stroke();
+  }
+  // the bright rim itself
+  for (let i = 0; i < 360; i++) {
+    const a = (i / 360) * Math.PI * 2, lit = rimLight(a, open);
+    if (lit <= 0) continue;
+    ctx.strokeStyle = `rgba(255,240,205,${.85 * lit * Math.min(1.5, blaze)})`; ctx.lineWidth = 3.5;
+    ctx.beginPath(); ctx.arc(0, 0, R, a, a + Math.PI * 2 / 360 + .004); ctx.stroke();
+  }
+  // the bead of light just before the ring closes
+  const bead = t < HIT ? Math.pow(prog(t, 1.3, HIT), 2) : Math.exp(-after * 4);
+  if (bead > 0) {
+    const a = START + Math.PI * .98;
+    const bx = Math.cos(a) * R, by = Math.sin(a) * R;
+    const bg2 = ctx.createRadialGradient(bx, by, 0, bx, by, 160);
+    bg2.addColorStop(0, `rgba(255,252,240,${bead})`); bg2.addColorStop(.15, `rgba(255,220,150,${.6 * bead})`); bg2.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = bg2; ctx.beginPath(); ctx.arc(bx, by, 160, 0, 6.283); ctx.fill();
+    const sw = 520 * bead, sl = ctx.createLinearGradient(bx - sw, 0, bx + sw, 0);   // anamorphic streak
+    sl.addColorStop(0, 'rgba(255,220,160,0)'); sl.addColorStop(.5, `rgba(255,250,235,${.9 * bead})`); sl.addColorStop(1, 'rgba(255,220,160,0)');
+    ctx.fillStyle = sl; ctx.fillRect(bx - sw, by - 2, sw * 2, 4);
+    ctx.fillStyle = `rgba(255,236,200,${.25 * bead})`; ctx.fillRect(bx - sw * .7, by - 7, sw * 1.4, 14);
+  }
+  ctx.globalCompositeOperation = 'source-over';
+  // the moon's disc
+  const disc = ctx.createRadialGradient(-R * .3, -R * .3, R * .1, 0, 0, R);
+  disc.addColorStop(0, '#080604'); disc.addColorStop(1, '#010101');
+  ctx.fillStyle = disc; ctx.beginPath(); ctx.arc(0, 0, R - 1.5, 0, 6.283); ctx.fill();
+  ctx.restore();
+}
+
+function frame(t) {
+  const zoom = 1.12 - .12 * easeOut(prog(t, 0, HIT + 1)) + .04 * easeInOut(prog(t, HIT + 1, 8));
+  sky(t, zoom);
+  grain(t);
+  const after = t - HIT;
+  $('#flash').style.opacity = after < 0 ? 0 : Math.exp(-after * 5) * clamp(after / .03) * .85;
+
+  // the monogram rises out of the dark disc
+  const m = easeOut(prog(t, HIT + .3, HIT + 1.6));
+  $('#mono').style.opacity = m;
+  $('#mono').style.transform = `scale(${zoom * (0.94 + .06 * m)})`;
+
+  // wordmark: letters rise from blur, one after another, from the center out
+  const mid = (chars.length - 1) / 2;
+  chars.forEach((c, i) => {
+    const k = easeOut(prog(t, 3.3 + Math.abs(i - mid) * .07, 4.2 + Math.abs(i - mid) * .07));
+    c.style.opacity = k;
+    c.style.transform = `translateY(${(1 - k) * 30}px)`;
+    c.style.filter = `blur(${(1 - k) * 12}px)`;
+  });
+  $('#rule').style.transform = `scaleX(${expoOut(prog(t, 4.2, 5))})`;
+  const s = easeOut(prog(t, 4.5, 5.5));
+  $('#sub').style.opacity = s;
+  $('#sub').style.letterSpacing = `${1.1 - .2 * s}em`;
+
+  $('#black').style.opacity = Math.max(1 - prog(t, 0, .4), easeInOut(prog(t, 7.2, 8)));
+}
+
+window.film = { frame, duration: 8, ready: fontsReady() };
+</script>
+</body>
+</html>
