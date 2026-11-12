@@ -1,0 +1,65 @@
+<!doctype html><meta charset="utf-8">
+<script type="module">
+// "Is your videographer from Chasing Vows?" The client asks; the two videos look the same.
+import { stage, S, set, text, OUT, INK, outBack, ease, ramp, makeChar, blinkAt, talk, fontReady, W, H } from './toon.js';
+import { couple, burst } from './props.js';
+const R0 = 52.6;
+const svg = stage('#f6e3c8');
+const office = S('g', {}, svg);
+S('rect', { y: 1300, width: W, height: 620, fill: '#d9b98f' }, office);
+S('rect', { x: 90, y: 230, width: 380, height: 440, rx: 14, fill: '#a9def2', ...OUT }, office);
+S('path', { d: 'M280 230 V670 M90 450 H470', ...OUT }, office);
+S('rect', { x: 820, y: 900, width: 120, height: 150, rx: 16, fill: '#c9683f', ...OUT }, office);
+S('path', { d: 'M880 900 q-110 -120 -40 -250 q50 110 40 250 q-10 -160 90 -230 q30 130 -90 230', fill: '#5fae5a', ...OUT, 'stroke-width': 7 }, office);
+const C = makeChar('C', office);
+S('rect', { x: -20, y: 1480, width: W + 40, height: 460, fill: '#b98a5e', ...OUT }, office);
+const lap = S('g', { transform: 'translate(540 1500)' }, office);
+S('rect', { x: -250, y: -300, width: 500, height: 310, rx: 20, fill: '#30303a', ...OUT }, lap);
+S('rect', { x: -310, y: 0, width: 620, height: 44, rx: 16, fill: '#55555f', ...OUT }, lap);
+S('circle', { cx: 0, cy: -150, r: 22, fill: '#fff', opacity: .5 }, lap);
+// what they think
+const bub = S('g', {}, svg);
+S('circle', { cx: -190, cy: 170, r: 18, fill: '#fff', ...OUT, 'stroke-width': 7 }, bub);
+S('circle', { cx: -140, cy: 110, r: 30, fill: '#fff', ...OUT, 'stroke-width': 7 }, bub);
+S('ellipse', { rx: 280, ry: 190, cy: -120, fill: '#fff', ...OUT }, bub);
+const c1 = couple(bub); set(c1, { transform: 'translate(-80 -30) scale(.62)' });
+text(bub, '?', 150, -40, 250, '#e2483d');
+// the comparison
+const cmp = S('g', {}, svg);
+S('rect', { width: W, height: H, fill: '#2f6f8f' }, cmp);
+const cards = [];
+for (const [i, label] of [[0, 'THEIR VIDEO'], [1, 'YOUR VIDEO']]) {
+  const g = S('g', {}, cmp);
+  S('rect', { x: -400, y: -250, width: 800, height: 500, rx: 30, fill: '#f6a55c', ...OUT, 'stroke-width': 12 }, g);
+  S('circle', { cx: 150, cy: -40, r: 120, fill: '#ffe08a' }, g);
+  S('rect', { x: -394, y: 120, width: 788, height: 124, fill: '#3a2a3a' }, g);
+  set(couple(g, '#3a2a3a'), { transform: 'translate(-60 150) scale(.9)' });
+  S('rect', { x: -400, y: -250, width: 800, height: 500, rx: 30, fill: 'none', ...OUT, 'stroke-width': 12 }, g);
+  text(g, label, 0, -290, 100, '#fff');
+  cards.push(g);
+}
+const stamp = S('g', {}, cmp);
+burst(stamp, 250, '#e2483d');
+text(stamp, 'SAME VIBE!', 0, 50, 150, '#fff');
+const who = S('g', {}, svg);
+S('circle', { r: 215, fill: '#9fd8ee', ...OUT, 'stroke-width': 12 }, who);
+const pc = S('g', { 'clip-path': 'url(#cp)' }, who);
+const P = makeChar('P', pc);
+const clipP = S('clipPath', { id: 'cp' }, svg); S('circle', { r: 208 }, clipP);
+window.film = { duration: 10.7, ready: fontReady(), frame(t) {
+  const r = R0 + t, m = talk(r), quote = r > 52.8 && r < 57.6;
+  office.style.display = r < 59.2 ? '' : 'none';
+  bub.style.display = r < 59.2 ? '' : 'none';
+  cmp.style.display = r >= 59.2 ? '' : 'none';
+  C.pose({ x: 540, y: 880, s: 1.25, mouth: quote ? m : 0, bob: quote ? m * 14 : 0, tilt: Math.sin(r * 4) * 2, look: r < 54.6 ? [0, 0.7] : [0.2, -0.3], blink: blinkAt(r), brow: r > 54.6 ? 1.2 : 0, hand: r > 54.6 ? [260, 330 - m * 40] : null, handRot: 10 });
+  set(bub, { transform: `translate(700 470) scale(${outBack(ramp(r, 55.2, 55.7))})` });
+  // "I was like, huh, why?"
+  const k = outBack(ramp(r, 57.5, 57.9)) * (r < 59.2 ? 1 : 0);
+  set(who, { transform: `translate(250 ${1330 + (1 - k) * 900}) scale(1)` });
+  who.style.display = r > 57.4 && r < 59.2 ? '' : 'none';
+  P.pose({ x: 0, y: 20, s: 0.72, mouth: r > 57.6 ? m : 0, brow: 1.5, look: [0.6, -0.5], tilt: -8, blink: blinkAt(r, 1) });
+  cards.forEach((g, i) => { const a = outBack(ramp(r, 59.3 + i * 0.5, 59.8 + i * 0.5)); set(g, { transform: `translate(${540 + (1 - a) * (i ? 1200 : -1200)} ${560 + i * 720}) rotate(${i ? 3 : -3})` }); });
+  const s = ramp(r, 62.3, 62.5);
+  set(stamp, { transform: `translate(540 920) rotate(-10) scale(${s ? 2.4 - 1.4 * ease(s) + Math.sin(r * 9) * 0.02 : 0})` });
+} };
+</script>

@@ -1,0 +1,8 @@
+<!doctype html><meta charset="utf-8">
+<script type="module">
+// In the car, the reel's seconds 133.0 to 152.9: who talks (spk) and where the camera is (cams).
+import { carScene, fontReady } from './toon.js';
+const car = carScene({ r0: 133.0, spk: [[133.0, "P"], [148.3, "D"], [148.7, "P"]], cams: [[133.0, "D"], [133.9, "two"], [138.0, "P"], [143.0, "D"], [144.0, "two"], [150.4, "P"]],
+  extra: (t,r,s)=>{ if(r<148.3){ s.dp.brow=-0.6; s.dp.smile=0.05; } if(r>150.5&&s.who==='P'){ s.pp.hand=[150+Math.sin(r*30)*70,380+Math.cos(r*26)*50]; } } });
+window.film = { duration: 19.9, ready: fontReady(), frame: car.frame };
+</script>

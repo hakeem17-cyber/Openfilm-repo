@@ -1,0 +1,50 @@
+<!doctype html><meta charset="utf-8">
+<script type="module">
+// "Eh, what's wrong with my computer? Why is everything slow?"
+import { stage, S, set, text, OUT, INK, ramp, outBack, rnd, makeChar, blinkAt, talk, fontReady, W, H } from './toon.js';
+const R0 = 185.5;
+const svg = stage('#3b3550');
+S('rect', { y: 1250, width: W, height: 700, fill: '#2a2540' }, svg);
+const mon = S('g', {}, svg);
+S('rect', { x: 70, y: 150, width: 940, height: 760, rx: 34, fill: '#17171d', ...OUT, 'stroke-width': 12 }, mon);
+S('rect', { x: 110, y: 190, width: 860, height: 440, rx: 10, fill: '#f6c9a4' }, mon);
+S('rect', { x: 470, y: 910, width: 140, height: 120, fill: '#17171d', ...OUT }, mon);
+S('rect', { x: 330, y: 1010, width: 420, height: 50, rx: 20, fill: '#17171d', ...OUT }, mon);
+// the picture: a ring on its way to a finger
+const handL = S('g', {}, mon), ringG = S('g', {}, mon);
+S('path', { d: 'M110 470 H330 Q420 440 520 452 Q560 458 556 480 Q552 500 510 500 H430 Q400 560 330 560 H110 Z', fill: '#e2b48c', ...OUT, 'stroke-width': 7 }, handL);
+const ghosts = [];
+for (let i = 0; i < 5; i++) ghosts.push(S('ellipse', { rx: 26, ry: 40, fill: 'none', stroke: '#ffd23f', 'stroke-width': 14, opacity: 0.12 + i * 0.05 }, ringG));
+const ring = S('ellipse', { rx: 26, ry: 40, fill: 'none', stroke: '#ffd23f', 'stroke-width': 16 }, ringG);
+const ringO = S('ellipse', { rx: 34, ry: 48, fill: 'none', stroke: INK, 'stroke-width': 5 }, ringG);
+const hr = S('g', {}, mon);
+S('path', { d: 'M970 380 H800 Q770 400 770 440 Q770 480 800 500 H970 Z', fill: '#c99a6b', ...OUT, 'stroke-width': 7 }, hr);
+S('rect', { x: 110, y: 190, width: 860, height: 440, rx: 10, fill: 'none', ...OUT }, mon);
+// the timeline
+S('rect', { x: 110, y: 660, width: 860, height: 210, rx: 10, fill: '#24242c' }, mon);
+['#4f9ad6', '#e2783d', '#4f9ad6', '#8f6fd6', '#4f9ad6'].forEach((c, i) => S('rect', { x: 126 + i * 168, y: 690, width: 156, height: 66, rx: 10, fill: c }, mon));
+S('rect', { x: 126, y: 776, width: 828, height: 66, rx: 10, fill: '#3fae5a' }, mon);
+const head = S('rect', { y: 664, width: 8, height: 202, fill: '#ff3b30' }, mon);
+const turtle = S('g', {}, mon);
+S('ellipse', { rx: 44, ry: 30, fill: '#5fae5a', ...OUT, 'stroke-width': 6 }, turtle);
+S('circle', { cx: 52, cy: -6, r: 16, fill: '#8fd07a', ...OUT, 'stroke-width': 6 }, turtle);
+S('path', { d: 'M-26 26 v16 M22 26 v16', ...OUT, 'stroke-width': 10 }, turtle);
+const P = makeChar('P', svg);
+const drops = [0, 1, 2].map(() => S('path', { d: 'M0 -26 Q22 6 0 20 Q-22 6 0 -26 Z', fill: '#8fd0f5', ...OUT, 'stroke-width': 5 }, svg));
+const why = S('g', {}, svg);
+S('rect', { x: -470, y: -120, width: 940, height: 170, rx: 30, fill: '#e2483d', ...OUT, 'stroke-width': 12 }, why);
+text(why, 'WHY ALL SLOW-MO?!', 0, 24, 124, '#fff');
+window.film = { duration: 5.4, ready: fontReady(), frame(t) {
+  const r = R0 + t, m = talk(r);
+  const x = 880 - t * 22;
+  set(ring, { cx: x, cy: 440 }); set(ringO, { cx: x, cy: 440 });
+  ghosts.forEach((g, i) => set(g, { cx: x + (5 - i) * 16, cy: 440 }));
+  set(hr, { transform: `translate(${-t * 22} 0)` });
+  set(head, { x: 300 + t * 6 });
+  set(turtle, { transform: `translate(${180 + t * 14} 590)` });
+  const shake = r > 187.7 ? Math.sin(t * 40) * 6 : 0;
+  P.pose({ x: 540 + shake, y: 1400, s: 1.3, mouth: m, bob: m * 14, look: [Math.sin(t * 6) * 0.5, -0.8], blink: blinkAt(t, 2), brow: -1, tilt: Math.sin(t * 3) * 4, hand: r > 187.7 ? [250, -120 + Math.sin(t * 14) * 14] : [240, 380 - m * 60], handRot: r > 187.7 ? -40 : 10 });
+  drops.forEach((d, i) => { const k = (t * 1.3 + i * 0.37) % 1; set(d, { transform: `translate(${(i ? 760 : 300) + i * 20 + (i - 1) * 40 * k} ${1220 + k * 150 - i * 30}) scale(${1.3 * (1 - k * 0.5)})`, opacity: 1 - k }); });
+  set(why, { transform: `translate(540 1130) rotate(-4) scale(${outBack(ramp(r, 187.85, 188.15))})` });
+} };
+</script>

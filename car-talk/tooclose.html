@@ -1,0 +1,26 @@
+<!doctype html><meta charset="utf-8">
+<script type="module">
+// "Yours is too close up… you have to go further."
+import { stage, S, set, text, OUT, ramp, outBack, rnd, makeChar, blinkAt, fontReady, W, H } from './toon.js';
+import { viewfinder } from './props.js';
+const R0 = 139.0;
+const svg = stage('#e9c9a8');
+const world = S('g', {}, svg);
+const C = makeChar('C', world);
+const vf = viewfinder(svg);
+const warn = S('g', {}, svg);
+S('rect', { x: -420, y: -130, width: 840, height: 190, rx: 30, fill: '#e2483d', ...OUT, 'stroke-width': 12 }, warn);
+text(warn, 'TOO CLOSE!', 0, 30, 170, '#fff');
+const go = S('g', {}, svg);
+S('rect', { x: -400, y: -100, width: 800, height: 150, rx: 30, fill: '#ffd23f', ...OUT, 'stroke-width': 12 }, go);
+text(go, 'GO FURTHER LAH', 0, 22, 110, '#2a1f1a', { stroke: 'none' });
+window.film = { duration: 4.6, ready: fontReady(), frame(t) {
+  const r = R0 + t, n = Math.floor(t * 14);
+  const jx = (rnd(n) - 0.5) * 260 + Math.sin(t * 5) * 120, jy = (rnd(n + 50) - 0.5) * 220 + Math.cos(t * 3.3) * 160;
+  C.pose({ x: 470 + jx, y: 1060 + jy, s: 4.3, mouth: 0.15 + 0.1 * Math.sin(t * 7), look: [Math.sin(t * 3), Math.cos(t * 2.2) * 0.6], blink: blinkAt(t, 1.2), brow: 1, tilt: Math.sin(t * 4) * 5 });
+  vf(t);
+  const k = ramp(r, 140.15, 140.4), off = r > 141.4;
+  set(warn, { transform: `translate(540 1480) rotate(-5) scale(${off ? 0 : k ? outBack(k) * (1 + 0.04 * Math.sin(t * 20)) : 0})` });
+  set(go, { transform: `translate(540 1480) rotate(4) scale(${outBack(ramp(r, 141.45, 141.75))})` });
+} };
+</script>

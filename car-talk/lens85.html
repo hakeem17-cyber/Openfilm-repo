@@ -1,0 +1,38 @@
+<!doctype html><meta charset="utf-8">
+<script type="module">
+// "The one shot you came in at 85mm, from way back. Wah, just nice."
+import { stage, S, set, text, OUT, INK, outBack, ease, ramp, lerp, makeChar, talk, blinkAt, fontReady, W, H } from './toon.js';
+import { couple, camera, burst } from './props.js';
+const R0 = 80.45;
+const svg = stage('#bfe8f5');
+const world = S('g', {}, svg);
+S('circle', { cx: 850, cy: 330, r: 110, fill: '#ffe08a' }, world);
+S('path', { d: `M-300 900 Q300 560 760 640 Q1100 560 1500 760 V2400 H-300 Z`, fill: '#8fd07a', ...OUT }, world);
+S('path', { d: `M-300 1300 Q400 1120 1500 1380 V2400 H-300 Z`, fill: '#6fbb62', ...OUT }, world);
+set(couple(world), { transform: 'translate(800 660) scale(.42)' });
+const line = S('path', { d: 'M330 1500 Q520 1050 770 640', fill: 'none', stroke: '#fff', 'stroke-width': 12, 'stroke-dasharray': '34 30', 'stroke-linecap': 'round' }, world);
+const far = S('g', {}, world);
+text(far, 'JAUUUUH', 0, 0, 120, '#fff');
+const D = makeChar('D', world);
+const camG = S('g', {}, world);
+set(camera(camG, 360), { transform: 'scale(1.25)' });
+const tag = S('g', {}, camG);
+S('rect', { x: 170, y: -150, width: 300, height: 110, rx: 22, fill: '#ffd23f', ...OUT }, tag);
+text(tag, '85mm', 320, -66, 96, '#2a1f1a', { stroke: 'none' });
+S('path', { d: `M-300 1750 q80 -220 200 -60 q60 -200 180 -20 q100 -160 160 60 V2400 H-300Z`, fill: '#4f9a4a', ...OUT }, world);
+const wah = S('g', {}, svg);
+burst(wah, 300);
+text(wah, 'WAH.', 0, -10, 190, '#e2483d');
+text(wah, 'JUST NICE!', 0, 140, 130, '#fff');
+window.film = { duration: 5.25, ready: fontReady(), frame(t) {
+  const r = R0 + t, k = ease(ramp(r, 82.6, 83.7));
+  const s = lerp(1.9, 0.98, k), cx = lerp(330, 540, k), cy = lerp(1480, 960, k);
+  set(world, { transform: `translate(${540 - cx * s} ${960 - cy * s}) scale(${s})` });
+  D.pose({ x: 170, y: 1480, s: 0.62, mouth: talk(r) * 0.8, look: [1, -0.3], brow: 1, blink: blinkAt(r), tilt: -6 });
+  set(camG, { transform: `translate(330 1500) rotate(-58) scale(.5)` });
+  line.style.opacity = far.style.opacity = k;
+  set(far, { transform: `translate(430 1090) rotate(-58) scale(${0.7 + 0.3 * k})` });
+  const w = ramp(r, 84.1, 84.35);
+  set(wah, { transform: `translate(420 470) rotate(-5) scale(${w ? outBack(w) * 0.85 : 0})` });
+} };
+</script>
