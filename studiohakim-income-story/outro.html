@@ -24,11 +24,11 @@ body{background:var(--orange)}
 <script type="module">
 import {prog,outBack,rise,fontsReady} from "./lib.js";
 const $=id=>document.getElementById(id);
-window.film={duration:6,ready:fontsReady(),frame(t){
+window.film={duration:7.7,ready:fontsReady(),frame(t){
   document.body.style.opacity=prog(t,0,.4);
   rise($("f"),t,.2);rise($("c"),t,.9);
   const p=outBack(prog(t,1.5,2.3));$("b").style.opacity=Math.min(1,p*2);$("b").style.scale=String(.8+.2*p);
   rise($("s"),t,2.2,.7,10);
-  document.body.style.opacity=Math.min(prog(t,0,.4),1-prog(t,5.3,6));
+  document.body.style.opacity=Math.min(prog(t,0,.4),1-prog(t,6.7,7.7));
 }};
 </script></body></html>

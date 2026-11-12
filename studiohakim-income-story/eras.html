@@ -31,12 +31,12 @@ const E=[["The base","2008/09 to 2010/11",24.6],["First growth","2011/12 to 2016
 const box=document.getElementById("eras");
 box.innerHTML=E.map((e,i)=>`<div class="era${i===3?" hi":""}"><div class="n">${e[0]}<small>${e[1]}</small></div><div class="tr"><i></i></div><div class="v">$0K</div></div>`).join("");
 const rows=[...box.children];
-window.film={duration:8,ready:fontsReady(),frame(t){
+window.film={duration:9.9,ready:fontsReady(),frame(t){
   rise(document.getElementById("h"),t,.1);
   rows.forEach((r,i)=>{const a=.6+i*.5;rise(r,t,a);const p=out3(prog(t,a+.2,a+1.4));
     r.querySelector("i").style.scale=`${p*E[i][2]/70} 1`;r.querySelector(".v").textContent="$"+(E[i][2]*p).toFixed(1)+"K"});
   rise(document.getElementById("m"),t,3.4);
   document.getElementById("x").textContent=(2.4*out3(prog(t,3.5,4.8))).toFixed(1)+"×";
-  document.body.style.opacity=1-prog(t,7.55,8);
+  document.body.style.opacity=1-prog(t,9.45,9.9);
 }};
 </script></body></html>

@@ -3,18 +3,36 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=1920, height=1080">
+<style>
+  @keyframes push { from { scale: 1 } to { scale: 1.035 } }
+</style>
 </head>
 <body>
 <section>
-  <iframe src="title.html" at="0"></iframe>
-  <iframe src="ch1-start.html" at="5"></iframe>
-  <iframe src="ch2-climb.html" at="12"></iframe>
-  <iframe src="ch3-slide.html" at="19"></iframe>
-  <iframe src="ch4-turbulence.html" at="27"></iframe>
-  <iframe src="ch5-step.html" at="35"></iframe>
-  <iframe src="ch6-settle.html" at="42"></iframe>
-  <iframe src="eras.html" at="50"></iframe>
-  <iframe src="outro.html" at="58"></iframe>
+  <iframe src="title.html" at="0" style="animation: push var(--clip-length) linear both"></iframe>
+  <iframe src="ch1-start.html" at="6.5" style="animation: push var(--clip-length) linear both"></iframe>
+  <iframe src="ch2-climb.html" at="15.1" style="animation: push var(--clip-length) linear both"></iframe>
+  <iframe src="ch3-slide.html" at="25.6" style="animation: push var(--clip-length) linear both"></iframe>
+  <iframe src="ch4-turbulence.html" at="38.3" style="animation: push var(--clip-length) linear both"></iframe>
+  <iframe src="ch5-step.html" at="49.0" style="animation: push var(--clip-length) linear both"></iframe>
+  <iframe src="ch6-settle.html" at="59.1" style="animation: push var(--clip-length) linear both"></iframe>
+  <iframe src="eras.html" at="74.4" style="animation: push var(--clip-length) linear both"></iframe>
+  <iframe src="outro.html" at="84.3" style="animation: push var(--clip-length) linear both"></iframe>
+</section>
+<section>
+  <audio src="assets/vo/01-title.wav" at="1.0" id="vo-01-title"></audio>
+  <audio src="assets/vo/02-start.wav" at="7.1" id="vo-02-start"></audio>
+  <audio src="assets/vo/03-climb.wav" at="15.7" id="vo-03-climb"></audio>
+  <audio src="assets/vo/04-slide.wav" at="26.2" id="vo-04-slide"></audio>
+  <audio src="assets/vo/05-turbulence.wav" at="38.9" id="vo-05-turbulence"></audio>
+  <audio src="assets/vo/06-step.wav" at="49.6" id="vo-06-step"></audio>
+  <audio src="assets/vo/07-settle.wav" at="59.7" id="vo-07-settle"></audio>
+  <audio src="assets/vo/08-eras.wav" at="75.0" id="vo-08-eras"></audio>
+  <audio src="assets/vo/09-outro.wav" at="84.9" id="vo-09-outro"></audio>
+</section>
+<section>
+  <audio src="assets/gentle-documentary-bed-f9987b.mp3#t=0,46" at="0" volume="0.1" id="music-1" overrides='[{"fade":[2,0]}]'></audio>
+  <audio src="assets/gentle-documentary-bed-f9987b.mp3#t=0,46.0" at="46" volume="0.1" id="music-2" overrides='[{"fade":[0,4]}]'></audio>
 </section>
 </body>
 </html>

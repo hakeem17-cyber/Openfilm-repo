@@ -26,7 +26,7 @@ h2{margin:26px 0 0;font-size:96px;color:var(--charcoal)}
 import {DATA,prog,out3,outBack,inOut,rise,fontsReady} from "./lib.js";
 const $=id=>document.getElementById(id);
 const pts=DATA.map((d,i)=>[i/(DATA.length-1)*1920,300-d[1]/100000*280]);
-window.film={duration:5,ready:fontsReady(),frame(t){
+window.film={duration:6.5,ready:fontsReady(),frame(t){
   rise($("a"),t,.1);
   const p=outBack(prog(t,.3,1.1));$("b").style.opacity=Math.min(1,p*2);$("b").style.scale=String(.85+.15*p);
   rise($("c"),t,.7);rise($("d"),t,1.1);
@@ -34,6 +34,6 @@ window.film={duration:5,ready:fontsReady(),frame(t){
   const n=q*(pts.length-1),j=Math.floor(n),f=n-j,ps=pts.slice(0,j+1);
   if(j+1<pts.length&&f>0)ps.push([pts[j][0]+(pts[j+1][0]-pts[j][0])*f,pts[j][1]+(pts[j+1][1]-pts[j][1])*f]);
   $("sp").setAttribute("points",ps.map(p=>p.join(",")).join(" "));
-  document.body.style.opacity=1-prog(t,4.6,5);
+  document.body.style.opacity=1-prog(t,6.1,6.5);
 }};
 </script></body></html>
