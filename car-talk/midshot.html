@@ -2,7 +2,7 @@
 <script type="module">
 // "Either you go further, or you get a mid shot. Just take a mid shot."
 import { stage, S, set, text, OUT, INK, ease, lerp, ramp, outBack, makeChar, blinkAt, fontReady, W, H } from './toon.js';
-const R0 = 143.6;
+const R0 = 144.4;
 const svg = stage('#cfe6d2');
 for (let i = 0; i < 12; i++) S('path', { d: `M0 ${i * 170} H${W}`, stroke: '#bcd9c0', 'stroke-width': 6 }, svg);
 const C = makeChar('C', svg);
@@ -14,7 +14,7 @@ const ltx = text(label, '', 0, 14, 100, '#fff', { 'stroke-width': 10 });
 const tick = S('g', {}, svg);
 S('circle', { r: 150, fill: '#3fae5a', ...OUT, 'stroke-width': 12 }, tick);
 S('path', { d: 'M-70 0 L-20 56 L80 -60', fill: 'none', stroke: '#fff', 'stroke-width': 40, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, tick);
-window.film = { duration: 4.9, ready: fontReady(), frame(t) {
+window.film = { duration: 4.1, ready: fontReady(), frame(t) {
   const r = R0 + t, k = ease(ramp(r, 144.7, 146.2));
   C.pose({ x: 540, y: 700, s: 1.15, mouth: 0, smile: 0.4 + k * 0.6, look: [0, 0.1], blink: blinkAt(t, 0.8), brow: k, tilt: Math.sin(t * 2) * 2, hand: k > 0.9 ? [290, 250 + Math.sin(t * 9) * 20] : null, handRot: 15 });
   const x = lerp(330, 150, k), y = lerp(470, 380, k), w = lerp(420, 780, k), h = lerp(430, 1100, k);

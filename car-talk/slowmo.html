@@ -34,7 +34,7 @@ const drops = [0, 1, 2].map(() => S('path', { d: 'M0 -26 Q22 6 0 20 Q-22 6 0 -26
 const why = S('g', {}, svg);
 S('rect', { x: -470, y: -120, width: 940, height: 170, rx: 30, fill: '#e2483d', ...OUT, 'stroke-width': 12 }, why);
 text(why, 'WHY ALL SLOW-MO?!', 0, 24, 124, '#fff');
-window.film = { duration: 5.4, ready: fontReady(), frame(t) {
+window.film = { duration: 5.1, ready: fontReady(), frame(t) {
   const r = R0 + t, m = talk(r);
   const x = 880 - t * 22;
   set(ring, { cx: x, cy: 440 }); set(ringO, { cx: x, cy: 440 });

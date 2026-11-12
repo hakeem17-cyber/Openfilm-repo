@@ -3,7 +3,7 @@
 // "The one shot you came in at 85mm, from way back. Wah, just nice."
 import { stage, S, set, text, OUT, INK, outBack, ease, ramp, lerp, makeChar, talk, blinkAt, fontReady, W, H } from './toon.js';
 import { couple, camera, burst } from './props.js';
-const R0 = 80.45;
+const R0 = 81.3;
 const svg = stage('#bfe8f5');
 const world = S('g', {}, svg);
 S('circle', { cx: 850, cy: 330, r: 110, fill: '#ffe08a' }, world);
@@ -24,7 +24,7 @@ const wah = S('g', {}, svg);
 burst(wah, 300);
 text(wah, 'WAH.', 0, -10, 190, '#e2483d');
 text(wah, 'JUST NICE!', 0, 140, 130, '#fff');
-window.film = { duration: 5.25, ready: fontReady(), frame(t) {
+window.film = { duration: 4.4, ready: fontReady(), frame(t) {
   const r = R0 + t, k = ease(ramp(r, 82.6, 83.7));
   const s = lerp(1.9, 0.98, k), cx = lerp(330, 540, k), cy = lerp(1480, 960, k);
   set(world, { transform: `translate(${540 - cx * s} ${960 - cy * s}) scale(${s})` });

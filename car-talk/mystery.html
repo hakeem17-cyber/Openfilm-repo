@@ -22,7 +22,7 @@ const voT = text(svg, 'VOICEOVER', 540, 1590, 54, '#ffd23f', { stroke: 'none' })
 const drama = S('g', {}, svg);
 text(drama, 'DRAMA', 0, 0, 330, '#e2483d', { stroke: '#fff', 'stroke-width': 18 });
 const serius = text(svg, 'SERIUS.', 540, 1130, 120, '#fff');
-window.film = { duration: 6.85, ready: fontReady(), frame(t) {
+window.film = { duration: 5.8, ready: fontReady(), frame(t) {
   const r = R0 + t;
   set(world, { transform: `translate(${540 - 540 * (1 + t * 0.02)} ${960 - 960 * (1 + t * 0.02)}) scale(${1 + t * 0.02})` });
   fog.forEach((f, i) => set(f, { cx: ((i * 260 + t * (30 + i * 9)) % 1700) - 300 }));
@@ -32,6 +32,6 @@ window.film = { duration: 6.85, ready: fontReady(), frame(t) {
   bars.forEach((b, i) => { const h = 16 + amp(r - Math.abs(i - 15) * 0.03) * 200 * (0.5 + rnd(i) * 0.5); set(b, { y: 1440 - h / 2, height: h }); });
   const k = ramp(r, 77.7, 77.95);
   set(drama, { transform: `translate(540 1010) rotate(-6) scale(${k ? 2.6 - 1.6 * ease(k) : 0})` });
-  serius.style.display = r > 79.4 ? '' : 'none';
+  serius.style.display = r > 78.9 ? '' : 'none';
 } };
 </script>

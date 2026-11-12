@@ -14,7 +14,7 @@ text(warn, 'TOO CLOSE!', 0, 30, 170, '#fff');
 const go = S('g', {}, svg);
 S('rect', { x: -400, y: -100, width: 800, height: 150, rx: 30, fill: '#ffd23f', ...OUT, 'stroke-width': 12 }, go);
 text(go, 'GO FURTHER LAH', 0, 22, 110, '#2a1f1a', { stroke: 'none' });
-window.film = { duration: 4.6, ready: fontReady(), frame(t) {
+window.film = { duration: 3.7, ready: fontReady(), frame(t) {
   const r = R0 + t, n = Math.floor(t * 14);
   const jx = (rnd(n) - 0.5) * 260 + Math.sin(t * 5) * 120, jy = (rnd(n + 50) - 0.5) * 220 + Math.cos(t * 3.3) * 160;
   C.pose({ x: 470 + jx, y: 1060 + jy, s: 4.3, mouth: 0.15 + 0.1 * Math.sin(t * 7), look: [Math.sin(t * 3), Math.cos(t * 2.2) * 0.6], blink: blinkAt(t, 1.2), brow: 1, tilt: Math.sin(t * 4) * 5 });

@@ -3,7 +3,7 @@
 // "Right after the ring shot, everything is slow. Super slow."
 import { stage, S, set, text, OUT, INK, ramp, outBack, lerp, makeChar, blinkAt, talk, fontReady, W, H } from './toon.js';
 import { couple, camera } from './props.js';
-const R0 = 190.9;
+const R0 = 192.1;
 const svg = stage('#f7d9e3');
 for (let i = 0; i < 9; i++) S('circle', { cx: 80 + i * 120, cy: 170 + (i % 2) * 60, r: 46, fill: i % 2 ? '#fff' : '#f4a9c0', ...OUT, 'stroke-width': 6 }, svg);
 S('path', { d: 'M0 160 Q540 330 1080 160', fill: 'none', ...OUT, 'stroke-width': 6 }, svg);
@@ -21,9 +21,9 @@ const bbg = S('rect', { x: -230, y: -90, width: 460, height: 140, rx: 26, fill: 
 text(badge, '120 FPS', 0, 22, 116, '#fff');
 const slow = S('g', {}, svg);
 const letters = 'SUUUPER SLOOOW'.split('').map((ch, i) => text(slow, ch, 0, 0, 150, i < 7 ? '#fff' : '#ffd23f'));
-window.film = { duration: 6.1, ready: fontReady(), frame(t) {
+window.film = { duration: 4.9, ready: fontReady(), frame(t) {
   const r = R0 + t, m = talk(r);
-  const x = 560 + Math.sin(t * 0.25) * 20, y = lerp(470, 560, t / 6.1);
+  const x = 560 + Math.sin(t * 0.25) * 20, y = lerp(470, 560, t / 4.9);
   set(ring, { cx: x, cy: y }); set(ringO, { cx: x, cy: y });
   set(gem, { transform: `translate(${x} ${y - 70})` });
   trail.forEach((c, i) => set(c, { cx: x - 6 * (4 - i), cy: y - (4 - i) * 26 }));
