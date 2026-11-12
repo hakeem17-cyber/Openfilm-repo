@@ -1,0 +1,48 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>The $100K target</title>
+<link rel="stylesheet" href="shared.css"><link rel="stylesheet" href="insight.css">
+<style>
+body{background:var(--orange)}
+.hd .tag{background:var(--charcoal)}
+.hd h1{color:var(--cream);-webkit-text-stroke:5px var(--charcoal);paint-order:stroke fill;text-shadow:7px 7px 0 var(--charcoal);font-size:120px}
+.track{position:absolute;left:120px;right:120px;top:560px;height:120px;background:var(--cream);border:6px solid var(--charcoal);box-shadow:12px 12px 0 var(--charcoal)}
+.fill{position:absolute;left:0;top:0;bottom:0;width:100%;background:var(--charcoal);transform-origin:left}
+.gapz{position:absolute;top:0;bottom:0;background:repeating-linear-gradient(135deg,rgba(58,59,63,.18) 0 14px,transparent 14px 28px)}
+.now{position:absolute;top:-92px;translate:-50% 0;font-family:var(--fd);font-weight:900;font-size:52px;color:var(--cream);-webkit-text-stroke:3px var(--charcoal);paint-order:stroke fill;white-space:nowrap}
+.goal{position:absolute;right:-6px;top:-150px;bottom:-30px;width:10px;background:var(--charcoal)}
+.goal span{position:absolute;right:18px;top:-6px;font-family:var(--fd);font-weight:900;font-size:34px;color:var(--charcoal);white-space:nowrap}
+.togo{position:absolute;top:50%;translate:-50% -50%;font-family:var(--fd);font-weight:900;font-size:34px;color:var(--charcoal);white-space:nowrap}
+.ticks{position:absolute;left:120px;right:120px;top:700px;font-family:var(--fd);font-weight:800;font-size:22px;color:var(--charcoal)}
+.ticks span{position:absolute;translate:-50% 0}
+.chips{position:absolute;left:120px;top:850px;display:flex;gap:24px}
+.chips div{background:var(--cream);border:5px solid var(--charcoal);padding:14px 24px;font-family:var(--fd);font-weight:900;font-size:34px;color:var(--charcoal)}
+.chips div small{display:block;font-size:18px;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);font-weight:800}
+.foot{color:var(--charcoal)}
+</style></head>
+<body><div id="app">
+<div class="hd"><span class="tag">The next milestone</span><h1 class="disp">$100K</h1></div>
+<div class="track" id="tr"><div class="fill" id="fill"></div><div class="gapz" id="gz"></div><div class="now" id="now">$0</div><div class="goal"><span>Target · $100K</span></div></div>
+<div class="ticks" id="ticks"></div>
+<div class="chips"><div id="c1"><small>2026 so far</small>$88,649</div><div id="c2"><small>Still to find</small>$11,351</div><div id="c3"><small>Time left</small>7 weeks</div></div>
+<p class="foot">2026 sales to 12 Nov 2026, from the Studiohakim Income Index.</p>
+</div>
+<script type="module">
+import {prog,out3,rise,fontsReady} from "./lib.js";
+import {TIMING} from "./timing.js";
+const tm=TIMING.target,D=tm.dur,c=tm.cues,$=id=>document.getElementById(id);
+const W=1920-240,v=88649/100000;
+$("ticks").innerHTML=[0,20,40,60,80,100].map(x=>`<span style="left:${x}%">$${x}K</span>`).join("");
+$("gz").style.left=(v*100)+"%";$("gz").style.right="0";
+
+window.film={duration:D,ready:fontsReady(),frame(t){
+  rise(document.querySelector(".hd"),t,.15);
+  rise($("tr"),t,.6);$("ticks").style.opacity=prog(t,.8,1.4);
+  const p=out3(prog(t,c[1],c[1]+2.4));
+  $("fill").style.scale=`${p*v} 1`;$("now").style.left=(p*v*100)+"%";$("now").textContent="$"+(88.6*p).toFixed(1)+"K";
+  $("now").style.opacity=prog(t,c[1],c[1]+.3);
+  const g=prog(t,c[1]+2.4,c[1]+3);$("gz").style.opacity=g;
+  ["c1","c2","c3"].forEach((id,i)=>rise($(id),t,c[1]+2.6+i*.5,.5,30));
+  document.querySelector(".foot").style.opacity=prog(t,c[1]+3,c[1]+3.6);
+  document.body.style.opacity=Math.min(prog(t,0,.35),1-prog(t,D-.45,D));
+}};
+</script></body></html>

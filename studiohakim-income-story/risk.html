@@ -1,0 +1,62 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>The risk</title>
+<link rel="stylesheet" href="shared.css"><link rel="stylesheet" href="insight.css">
+<style>
+body{background:var(--charcoal)}
+.donut{position:absolute;left:120px;top:330px;width:560px;height:560px}
+.dc{position:absolute;left:120px;top:330px;width:560px;height:560px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--cream)}
+.dc b{font-family:var(--fd);font-weight:900;font-size:120px;line-height:1;color:var(--orange)}
+.dc span{font-family:var(--fd);font-weight:800;font-size:22px;letter-spacing:.1em;text-transform:uppercase;margin-top:8px}
+.side{position:absolute;left:780px;right:120px;top:340px;color:var(--cream)}
+.leg{display:grid;gap:12px;margin:0;padding:0;list-style:none}
+.leg li{display:grid;grid-template-columns:26px 1fr auto;gap:16px;align-items:center;font-size:26px}
+.leg em{width:26px;height:26px;border:3px solid var(--cream)}
+.leg b{font-family:var(--fd);font-weight:900;font-size:28px}
+.gap{margin-top:34px;display:inline-block;background:var(--orange);color:#fff;border:4px solid var(--cream);font-family:var(--fd);font-weight:900;font-size:28px;text-transform:uppercase;padding:12px 20px}
+.rates{position:absolute;left:780px;right:120px;top:760px;color:var(--cream)}
+.rates h4{margin:0 0 14px;font-family:var(--fd);font-weight:800;font-size:20px;letter-spacing:.12em;text-transform:uppercase;color:#c9c6bf}
+.rt{display:grid;grid-template-columns:330px 1fr 120px;gap:18px;align-items:center;margin:10px 0;font-size:23px}
+.rt .t{height:26px;background:#4a4b50;border:3px solid var(--cream)}
+.rt .t i{display:block;height:100%;transform-origin:left;background:var(--grey)}
+.rt.lo .t i{background:var(--orange)}
+.rt b{font-family:var(--fd);font-weight:900;font-size:28px;text-align:right}
+.rt.lo b{color:var(--orange)}
+</style></head>
+<body class="dark"><div id="app">
+<div class="hd"><span class="tag">The risk</span><h1 class="disp">One client, <em>60% of sales</em></h1></div>
+<svg class="donut" viewBox="0 0 120 120" id="don"></svg>
+<div class="dc" id="dc"><b id="pc">0%</b><span>Studiofive Weddings</span><span style="font-size:18px;color:#c9c6bf;margin-top:4px">share of 2025 sales</span></div>
+<div class="side">
+  <ul class="leg" id="leg"></ul>
+  <div class="gap" id="gap">No second client fills the gap yet</div>
+</div>
+<div class="rates" id="rates"><h4>2025 · dollars per coverage hour</h4></div>
+<p class="foot">2025 sales $82,858. Hours are the coverage hours on the ledger.</p>
+</div>
+<script type="module">
+import {prog,out3,inOut,rise,fontsReady} from "./lib.js";
+import {TIMING} from "./timing.js";
+const tm=TIMING.risk,D=tm.dur,c=tm.cues,$=id=>document.getElementById(id);
+const DN=[["Studiofive Weddings",49790,"#E8742A"],["N.O.A Studios (gaffing)",9077,"#C85A14"],["InTheMomentSg",8669,"#8d8f96"],["Others",7582,"#b9bac0"],["Studiohakim direct",4800,"#f0a46c"],["Three smaller clients",2940,"#6a6b70"]];
+const tot=82858,C=2*Math.PI*44;let off=0;
+$("don").innerHTML=`<circle cx="60" cy="60" r="44" fill="none" stroke="#4a4b50" stroke-width="20"/>`+DN.map(x=>{const len=x[1]/tot*C,s=`<circle cx="60" cy="60" r="44" fill="none" stroke="${x[2]}" stroke-width="20" data-len="${len}" data-off="${off}" transform="rotate(-90 60 60)"/>`;off+=len;return s}).join("");
+const segs=[...$("don").querySelectorAll("circle[data-len]")];
+$("leg").innerHTML=DN.map(x=>`<li><em style="background:${x[2]}"></em><span>${x[0]}</span><b>${Math.round(x[1]/tot*100)}%</b></li>`).join("");
+const lis=[...$("leg").children];
+const R=[["Overall average",70,0],["Studiofive Weddings",76,0],["N.O.A gaffing",39,1]];
+$("rates").insertAdjacentHTML("beforeend",R.map(r=>`<div class="rt${r[2]?" lo":""}"><span>${r[0]}</span><span class="t"><i></i></span><b>$${r[1]}</b></div>`).join(""));
+const rts=[...document.querySelectorAll(".rt")];
+window.film={duration:D,ready:fontsReady(),frame(t){
+  rise(document.querySelector(".hd"),t,.15);
+  const p=inOut(prog(t,c[1]-.2,c[1]+1.8));
+  segs.forEach(s=>{const len=+s.dataset.len,o=+s.dataset.off,vis=Math.max(0,Math.min(len,p*C-o));s.setAttribute("stroke-dasharray",`${vis.toFixed(2)} ${C}`);s.setAttribute("stroke-dashoffset",(-o).toFixed(2))});
+  $("pc").textContent=Math.round(60*out3(prog(t,c[1],c[1]+1.6)))+"%";
+  $("dc").style.opacity=prog(t,c[1]-.2,c[1]+.4);
+  lis.forEach((l,i)=>rise(l,t,c[1]+.2+i*.15,.5,20));
+  const g=prog(t,c[2]-.1,c[2]+.5);$("gap").style.opacity=g;$("gap").style.scale=String(.8+.2*out3(g));
+  rise($("rates"),t,c[3]-.2);
+  rts.forEach((r,i)=>{r.querySelector("i").style.scale=`${out3(prog(t,c[3]+.3+i*.4,c[3]+1.3+i*.4))*R[i][1]/100} 1`});
+  document.querySelector(".foot").style.opacity=prog(t,c[3],c[3]+.6);
+  document.body.style.opacity=Math.min(prog(t,0,.35),1-prog(t,D-.45,D));
+}};
+</script></body></html>

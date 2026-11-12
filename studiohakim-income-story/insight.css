@@ -1,0 +1,16 @@
+/* the insight scenes after the chart: findings, risk, target, moves, plan */
+#app{position:absolute;inset:0}
+.hd{position:absolute;left:120px;top:96px;right:120px}
+.hd .tag{background:var(--orange);color:#fff;font-size:20px;padding:8px 16px}
+.hd h1{margin:22px 0 0;font-size:84px;color:var(--charcoal)}
+.hd h1 em{font-style:normal;color:var(--orange)}
+.dark{background:var(--charcoal)}
+.dark .hd h1{color:var(--cream)}
+.cards{position:absolute;left:120px;right:120px;top:360px;display:grid;gap:30px}
+.card{background:var(--paper);border:5px solid var(--charcoal);box-shadow:10px 10px 0 var(--charcoal);padding:30px 30px 34px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.card .big{font-family:var(--fd);font-weight:900;font-size:64px;line-height:1;color:var(--orange);white-space:nowrap}
+.card h3{margin:0;font-family:var(--fd);font-weight:900;text-transform:uppercase;font-size:28px;line-height:1.15;color:var(--charcoal)}
+.card p{margin:0;font-size:23px;line-height:1.42;color:#4a4b50}
+.card .ic{width:64px;height:64px}
+.foot{position:absolute;left:120px;right:120px;bottom:60px;margin:0;font-size:20px;color:var(--mute)}
+.dark .foot{color:#b9bac0}

@@ -1,9 +1,10 @@
 import {DATA,clamp,prog,out3,outBack,inOut,K,rise,fontsReady} from "./lib.js";
 /* One chapter of the journey: the 18-year chart, with every bar up to this chapter shown
-   and this chapter's bars growing in. */
+   and this chapter's bars growing in. Bands shade a stretch of years (COVID, part-time, full-time). */
 export function chapter(cfg){
   const W=1060,H=640,top=100000;
   const app=document.getElementById("app");
+  const bands=cfg.bands||[];
   app.innerHTML=`
   <div class="left">
     <div class="kick"><span class="num">${String(cfg.n).padStart(2,"0")}</span><span class="tag">${cfg.kicker}</span></div>
@@ -12,6 +13,7 @@ export function chapter(cfg){
     <div class="statbox"><div class="stat disp">${cfg.stat}</div><div class="slab">${cfg.statLabel}</div></div>
   </div>
   <div class="chart">
+    ${bands.map(b=>`<div class="band ${b.kind}"><span>${b.label}</span></div>`).join("")}
     <div class="grid">${[0,20,40,60,80,100].map(v=>`<div class="gl" style="bottom:${v/100*H}px"><span>$${v}K</span></div>`).join("")}</div>
     <div class="floor" style="bottom:${80/100*H}px"><span>The new floor · $80K</span></div>
     <div class="bars">${DATA.map((d,i)=>`<div class="col"><div class="b" style="height:${d[1]/top*H}px"><span class="v">${K(d[1])}${i===17?"*":""}</span></div><span class="yl">${d[0]}</span></div>`).join("")}</div>
@@ -21,10 +23,11 @@ export function chapter(cfg){
   </div>`;
   const cols=[...app.querySelectorAll(".col")],slot=W/DATA.length;
   const cx=i=>i*slot+slot/2, cy=i=>H-DATA[i][1]/top*H;
-  const pl=app.querySelector("polyline"),notes=[...app.querySelectorAll(".note")];
+  const pl=app.querySelector("polyline"),notes=[...app.querySelectorAll(".note")],bandEls=[...app.querySelectorAll(".band")];
   const parts=[...app.querySelector(".left").children];
   const statEl=app.querySelector(".stat"),floorEl=app.querySelector(".floor");
   notes.forEach((el,k)=>{const n=cfg.notes[k];el.style.left=cx(n.i)+"px";el.style.bottom=(H-cy(n.i)+70+(n.dy||0))+"px"});
+  bandEls.forEach((el,k)=>{const b=bands[k];el.style.left=(b.from*slot+2)+"px";el.style.width=((b.to-b.from+1)*slot-4)+"px"});
   const D=cfg.duration,span=cfg.to-cfg.from+1;
   return {duration:D,ready:fontsReady(),frame(t){
     parts.forEach((el,k)=>rise(el,t,.15+k*.18));
@@ -49,6 +52,7 @@ export function chapter(cfg){
     if(f>0&&j+1<DATA.length)pts.push([cx(j)+(cx(j+1)-cx(j))*f,cy(j)+(cy(j+1)-cy(j))*f]);
     pl.setAttribute("points",pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" "));
     notes.forEach((el,k)=>{const a=cfg.notes[k].at||3.2;const p=prog(t,a,a+.6);el.style.opacity=clamp(p*2);el.style.scale=String(.7+.3*outBack(p))});
+    bandEls.forEach((el,k)=>{const a=bands[k].at??.5,p=out3(prog(t,a,a+.8));el.style.opacity=p;el.style.clipPath=`inset(0 0 0 0)`;el.style.scale=`1 ${.2+.8*p}`});
     if(cfg.floor){const p=out3(prog(t,cfg.floorAt||2.8,(cfg.floorAt||2.8)+1));floorEl.style.opacity=p>0?1:0;floorEl.style.clipPath=`inset(-60px ${(1-p)*100}% -10px 0)`}else floorEl.style.opacity=0;
     const cf=app.querySelector(".cfoot");if(cf)cf.style.opacity=prog(t,3.5,4.2);
     app.style.opacity=1-prog(t,D-.45,D);
