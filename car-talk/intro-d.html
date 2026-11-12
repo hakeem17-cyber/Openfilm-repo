@@ -1,0 +1,44 @@
+<!doctype html><meta charset="utf-8">
+<script type="module">
+// Intro D, "Comic panels": three panels slam in, then the name stamps across them.
+import { stage, S, set, text, OUT, INK, outBack, ease, ramp, lerp, makeChar, blinkAt, fontReady, W, H } from './toon.js';
+import { burst } from './props.js';
+import { sideCar } from './intro-kit.js';
+const svg = stage('#2a1f1a');
+const mkPanel = (id, pts, fill) => {
+  const g = S('g', {}, svg);
+  S('polygon', { points: pts }, S('clipPath', { id }, svg));
+  const inner = S('g', { 'clip-path': `url(#${id})` }, g);
+  S('rect', { width: W, height: H, fill }, inner);
+  for (let i = 0; i < 16; i++) S('path', { d: 'M0 0 L-70 -1600 L70 -1600 Z', fill: '#fff', opacity: .16, transform: `translate(540 ${id === 'p3' ? 1500 : id === 'p2' ? 960 : 400}) rotate(${i * 22.5})` }, inner);
+  S('polygon', { points: pts, fill: 'none', stroke: '#fff', 'stroke-width': 18, 'stroke-linejoin': 'round' }, g);
+  return [g, inner];
+};
+const [g1, i1] = mkPanel('p1', '30,30 1050,30 1050,560 30,700', '#ffd23f');
+const [g2, i2] = mkPanel('p2', '30,740 1050,600 1050,1180 30,1320', '#39b6e8');
+const [g3, i3] = mkPanel('p3', '30,1360 1050,1220 1050,1890 30,1890', '#e2483d');
+const D = makeChar('D', i1), P = makeChar('P', i2);
+text(i1, 'THE DRIVER', 760, 500, 84, '#fff');
+text(i2, 'THE EDITOR', 300, 960, 84, '#fff');
+const car = sideCar(svg, i3, '#ffd23f', 'win-d');
+const logo = S('g', {}, svg);
+burst(logo, 340, '#fff');
+text(logo, 'Pod', -235, 50, 210, '#39b6e8', { 'stroke-width': 30 });
+text(logo, 'CARS', 170, 60, 250, '#e2483d', { 'stroke-width': 30 });
+const tag = S('g', {}, svg);
+S('rect', { x: -400, y: -80, width: 800, height: 120, rx: 30, fill: '#ffd23f', ...OUT }, tag);
+text(tag, 'TALKING SHOTS ON THE ROAD', 0, 8, 64, INK, { stroke: 'none' });
+window.film = { duration: 3, ready: fontReady(), frame(t) {
+  const slam = (a) => { const k = ramp(t, a, a + 0.22); return k ? 1 - ease(k) + Math.sin(ramp(t, a + 0.22, a + 0.5) * Math.PI) * -0.012 : 1; };
+  set(g1, { transform: `translate(${slam(0.08) * -1200} 0)` });
+  set(g2, { transform: `translate(${slam(0.38) * 1200} 0)` });
+  set(g3, { transform: `translate(0 ${slam(0.68) * 900})` });
+  D.pose({ x: 330, y: 400, s: 1.15, smile: 1, brow: 1, look: [0.5, -0.2], tilt: -6 + Math.sin(t * 5) * 3, blink: blinkAt(t, 0.4), mouth: 0.25 + 0.2 * Math.sin(t * 9) });
+  P.pose({ x: 760, y: 900, s: 0.95, smile: 1, brow: 1, look: [-0.5, -0.2], tilt: 6 - Math.sin(t * 5) * 3, blink: blinkAt(t, 1.5) });
+  const x = lerp(-600, 560, ease(ramp(t, 0.7, 1.4)));
+  set(car.g, { transform: `translate(${x} 1840) scale(.66)` }); car.frame(x, t, t > 1.4 ? Math.abs(Math.sin((t - 1.4) * 14)) * Math.max(0, 1 - (t - 1.4)) : 0);
+  const p = ramp(t, 1.15, 1.4), shake = t > 1.4 && t < 1.7 ? Math.sin(t * 90) * 10 : 0;
+  set(logo, { transform: `translate(${540 + shake} 1370) rotate(-7) scale(${p ? (2.2 - 1.2 * ease(p)) * 0.8 : 0})` });
+  set(tag, { transform: `translate(540 ${650 + (1 - outBack(ramp(t, 1.7, 2.05))) * -900}) rotate(3)` });
+} };
+</script>
