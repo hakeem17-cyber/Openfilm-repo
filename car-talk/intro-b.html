@@ -2,7 +2,7 @@
 <script type="module">
 // Intro B, "Neon night": the sign flickers on over a night road as the car cruises past.
 import { stage, S, set, text, OUT, INK, outBack, ease, ramp, lerp, rnd, fontReady, W, H } from './toon.js';
-import { sideCar } from './intro-kit.js';
+import { sideCar, podcars, logoReady } from './intro-kit.js';
 const svg = stage('#15122b');
 const defs = S('defs', {}, svg);
 const f = S('filter', { id: 'glow', x: '-40%', y: '-40%', width: '180%', height: '180%' }, defs);
@@ -17,11 +17,14 @@ const beam = S('path', { d: 'M0 0 L700 -130 L700 150 Z', fill: '#fff3b0', opacit
 const sign = S('g', {}, svg);
 S('rect', { x: -470, y: -260, width: 940, height: 520, rx: 50, fill: '#1c1838', stroke: '#3a3466', 'stroke-width': 14 }, sign);
 const mk = (str, x, y, size, col) => { const g = S('g', {}, sign); for (const blur of [1, 0]) { const t = S('text', { x, y, 'font-size': size, 'text-anchor': 'middle', fill: blur ? col : '#fff', stroke: col, 'stroke-width': blur ? 26 : 5 }, g); t.textContent = str; if (blur) t.setAttribute('filter', 'url(#glow)'); } return g; };
-const n1 = mk('Pod', -230, 40, 230, '#39d5ff'), n2 = mk('CARS', 165, 50, 270, '#ff4fa0'), n3 = mk('TALKING SHOTS ON THE ROAD', 0, 190, 62, '#ffd23f');
+const n1 = S('g', {}, sign), NEON = ['#39d5ff', '#ff4fa0'];
+podcars(n1, 215, NEON[0], NEON[1], 26, { y: 50, filter: 'url(#glow)' }, NEON);
+podcars(n1, 215, '#fff', '#fff', 5, { y: 50 }, NEON);
+const n3 = mk('TALKING SHOTS ON THE ROAD', 0, 190, 62, '#ffd23f');
 const car = sideCar(svg, svg, '#e2483d');
-window.film = { duration: 3, ready: fontReady(), frame(t) {
+window.film = { duration: 3, ready: logoReady(), frame(t) {
   const fl = (a, seed) => t < a ? 0.07 : t < a + 0.45 ? (rnd(Math.floor(t * 28) + seed) > 0.45 ? 1 : 0.15) : 0.94 + Math.sin(t * 40 + seed) * 0.06;
-  n1.style.opacity = fl(0.35, 1); n2.style.opacity = fl(0.8, 5); n3.style.opacity = fl(1.4, 9);
+  n1.style.opacity = fl(0.4, 1); n3.style.opacity = fl(1.4, 9);
   set(sign, { transform: `translate(540 640) rotate(-4) scale(${0.96 + ease(ramp(t, 0, 3)) * 0.06})` });
   const x = lerp(-700, 1900, ramp(t, 0.2, 3.0));
   set(dashes, { transform: `translate(${-((t * 500) % 300)} 0)` });

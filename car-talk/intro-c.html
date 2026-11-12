@@ -1,6 +1,7 @@
 <!doctype html><meta charset="utf-8">
 <script type="module">
 // Intro C, "Road sign": from the driver's seat, a highway sign with the show's name rushes up.
+import { podcars, logoReady } from './intro-kit.js';
 import { stage, S, set, text, OUT, INK, outBack, ease, ramp, lerp, makeChar, blinkAt, fontReady, W, H } from './toon.js';
 const svg = stage('#8fd3f2');
 S('circle', { cx: 860, cy: 300, r: 120, fill: '#ffe27a' }, svg);
@@ -14,8 +15,7 @@ S('rect', { x: -330, y: 180, width: 30, height: 520, fill: '#8d939c', ...OUT, 's
 S('rect', { x: 300, y: 180, width: 30, height: 520, fill: '#8d939c', ...OUT, 'stroke-width': 7 }, sign);
 S('rect', { x: -480, y: -300, width: 960, height: 520, rx: 44, fill: '#1f9d55', ...OUT, 'stroke-width': 14 }, sign);
 S('rect', { x: -450, y: -270, width: 900, height: 460, rx: 30, fill: 'none', stroke: '#fff', 'stroke-width': 10 }, sign);
-text(sign, 'Pod', -225, 0, 210, '#fff', { 'stroke-width': 26 });
-text(sign, 'CARS', 175, 10, 250, '#ffd23f', { 'stroke-width': 26 });
+podcars(sign, 215, '#fff', '#ffd23f', 26, { y: 20 });
 text(sign, 'TALKING SHOTS ON THE ROAD', 0, 130, 62, '#fff', { stroke: 'none' });
 // the cabin in front of us
 const dash = S('g', {}, svg);
@@ -37,7 +37,7 @@ S('path', { d: 'M0 0 V250', ...OUT, 'stroke-width': 7 }, mic);
 S('rect', { x: -44, y: 250, width: 88, height: 150, rx: 44, fill: '#c9c9d2', ...OUT }, mic);
 S('path', { d: 'M-40 300 H40 M-40 340 H40', ...OUT, 'stroke-width': 6 }, mic);
 S('rect', { x: -22, y: 400, width: 44, height: 70, rx: 12, fill: '#33323a', ...OUT, 'stroke-width': 7 }, mic);
-window.film = { duration: 3, ready: fontReady(), frame(t) {
+window.film = { duration: 3, ready: logoReady(), frame(t) {
   lines.forEach((l, i) => { const k = ((t * 1.6 + i / 5) % 1), k2 = k * k, y = 880 + k2 * 1040, y2 = y + 30 + k2 * 220, w = 8 + k2 * 60, w2 = 8 + (y2 - 880) / 1040 * 60; set(l, { d: `M${540 - w} ${y} H${540 + w} L${540 + w2} ${y2} H${540 - w2} Z` }); });
   set(clouds, { transform: `translate(${-t * 12} 0)` });
   const k = ramp(t, 0.25, 1.25), s = lerp(0.04, 1, k * k * k) * (k >= 1 ? 1 + Math.sin(ramp(t, 1.25, 1.6) * Math.PI) * 0.06 : 1);

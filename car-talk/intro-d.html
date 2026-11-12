@@ -3,7 +3,7 @@
 // Intro D, "Comic panels": three panels slam in, then the name stamps across them.
 import { stage, S, set, text, OUT, INK, outBack, ease, ramp, lerp, makeChar, blinkAt, fontReady, W, H } from './toon.js';
 import { burst } from './props.js';
-import { sideCar } from './intro-kit.js';
+import { sideCar, podcars, logoReady } from './intro-kit.js';
 const svg = stage('#2a1f1a');
 const mkPanel = (id, pts, fill) => {
   const g = S('g', {}, svg);
@@ -23,12 +23,11 @@ text(i2, 'THE EDITOR', 300, 960, 84, '#fff');
 const car = sideCar(svg, i3, '#ffd23f', 'win-d');
 const logo = S('g', {}, svg);
 burst(logo, 340, '#fff');
-text(logo, 'Pod', -235, 50, 210, '#39b6e8', { 'stroke-width': 30 });
-text(logo, 'CARS', 170, 60, 250, '#e2483d', { 'stroke-width': 30 });
+podcars(logo, 225, '#39b6e8', '#e2483d', 30, { y: 70 });
 const tag = S('g', {}, svg);
 S('rect', { x: -400, y: -80, width: 800, height: 120, rx: 30, fill: '#ffd23f', ...OUT }, tag);
 text(tag, 'TALKING SHOTS ON THE ROAD', 0, 8, 64, INK, { stroke: 'none' });
-window.film = { duration: 3, ready: fontReady(), frame(t) {
+window.film = { duration: 3, ready: logoReady(), frame(t) {
   const slam = (a) => { const k = ramp(t, a, a + 0.22); return k ? 1 - ease(k) + Math.sin(ramp(t, a + 0.22, a + 0.5) * Math.PI) * -0.012 : 1; };
   set(g1, { transform: `translate(${slam(0.08) * -1200} 0)` });
   set(g2, { transform: `translate(${slam(0.38) * 1200} 0)` });

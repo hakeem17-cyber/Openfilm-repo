@@ -1,5 +1,5 @@
 // What the intro variations share: the little car seen from the side.
-import { S, set, OUT, makeChar, blinkAt } from './toon.js';
+import { S, set, OUT, INK, makeChar, blinkAt, fontReady } from './toon.js';
 
 /** The car around the middle of its floor, facing right. Returns { g, frame(x, t, bounce) }. */
 export function sideCar(svg, parent, color = '#2f9fd6', id = 'win') {
@@ -26,4 +26,15 @@ export function sideCar(svg, parent, color = '#2f9fd6', id = 'win') {
     P.pose({ x: -95, y: -265, s: 0.3, look: [1, 0], smile: 1, blink: blinkAt(t, 1) });
     D.pose({ x: 150, y: -270, s: 0.3, look: [1, 0], smile: 1, mouth: bounce * 0.6, blink: blinkAt(t, 0.2) });
   } };
+}
+
+/** Both fonts the intros use. */
+export const logoReady = () => Promise.all([fontReady(), new FontFace('Lilita', 'url(lilita.woff2)').load().then((f) => { document.fonts.add(f); }).catch(() => {})]);
+
+/** The show's name as one word, "Pod" in c1 and "Cars" in c2, centred on the origin. */
+export function podcars(parent, size, c1, c2, sw = 30, extra = {}, strokes = [INK, INK]) {
+  const t = S('text', { x: 0, y: 0, 'font-size': size, 'text-anchor': 'middle', 'stroke-width': sw, 'paint-order': 'stroke', 'stroke-linejoin': 'round', style: 'font-family:Lilita,sans-serif;letter-spacing:0', ...extra }, parent);
+  S('tspan', { fill: c1, stroke: strokes[0] }, t).textContent = 'Pod';
+  S('tspan', { fill: c2, stroke: strokes[1] }, t).textContent = 'Cars';
+  return t;
 }

@@ -3,6 +3,7 @@
 // The show's opening: the car drives in, brakes, and the PodCARS name lands.
 import { stage, S, set, text, OUT, INK, outBack, ease, ramp, lerp, makeChar, blinkAt, fontReady, W, H } from './toon.js';
 import { burst } from './props.js';
+import { podcars, logoReady } from './intro-kit.js';
 const svg = stage('#ffd23f');
 for (let y = 0; y < 34; y++) for (let x = 0; x < 19; x++) S('circle', { cx: x * 60 + (y % 2) * 30, cy: y * 60, r: 3 + y * 0.42, fill: '#f6b92b' }, svg);
 const rays = S('g', {}, svg);
@@ -34,15 +35,14 @@ const honk = S('g', {}, svg);
 for (const a of [-30, 0, 30]) S('path', { d: 'M0 0 L150 0', stroke: '#e2483d', 'stroke-width': 22, 'stroke-linecap': 'round', transform: `rotate(${a - 20}) translate(60 0)` }, honk);
 const logo = S('g', {}, svg);
 burst(logo, 330, '#e2483d');
-const l1 = text(logo, 'Pod', -235, 50, 210, '#fff', { 'stroke-width': 30 });
-const l2 = text(logo, 'CARS', 170, 60, 250, '#ffd23f', { 'stroke-width': 30 });
+podcars(logo, 225, '#fff', '#ffd23f', 30, { y: 70 });
 const tag = S('g', {}, svg);
 S('rect', { x: -400, y: -80, width: 800, height: 120, rx: 30, fill: INK }, tag);
 text(tag, 'TALKING SHOTS ON THE ROAD', 0, 8, 64, '#ffd23f', { stroke: 'none' });
-window.film = { duration: 3, ready: fontReady(), frame(t) {
+window.film = { duration: 3, ready: logoReady(), frame(t) {
   set(rays, { transform: `translate(540 800) rotate(${t * 14})` });
   const k = ease(ramp(t, 0.05, 0.85)), x = lerp(-700, 540, k) + (t > 2.75 ? Math.pow((t - 2.75) / 0.25, 2) * 1500 : 0);
-  const brake = Math.sin(ramp(t, 0.8, 1.15) * Math.PI), beep = t > 1.3 && t < 1.9 ? Math.abs(Math.sin((t - 1.3) * 21)) : 0;
+  const brake = Math.sin(ramp(t, 0.8, 1.15) * Math.PI), beep = t > 1.3 && t < 1.6 ? Math.sin((t - 1.3) / 0.3 * Math.PI) : t > 1.72 && t < 2.27 ? Math.sin((t - 1.72) / 0.55 * Math.PI) : 0;
   set(dashes, { transform: `translate(${-((x * 0.9 + 4000) % 300)} 0)` });
   set(car, { transform: `translate(${x} 1560)` });
   set(bodyG, { transform: `translate(0 ${-66 - beep * 16}) rotate(${brake * 5}) scale(${1 + beep * 0.03} ${1 - brake * 0.04})` });
