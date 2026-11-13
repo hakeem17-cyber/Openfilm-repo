@@ -1,0 +1,40 @@
+<!doctype html><meta charset="utf-8">
+<script type="module">
+// "Right after the ring shot, everything is slow. Super slow."
+import { stage, S, set, text, OUT, INK, ramp, outBack, lerp, makeChar, blinkAt, talk, fontReady, W, H } from './toon.js';
+import { couple, camera } from './props.js';
+const R0 = 192.1;
+const svg = stage('#f7d9e3');
+for (let i = 0; i < 9; i++) S('circle', { cx: 80 + i * 120, cy: 170 + (i % 2) * 60, r: 46, fill: i % 2 ? '#fff' : '#f4a9c0', ...OUT, 'stroke-width': 6 }, svg);
+S('path', { d: 'M0 160 Q540 330 1080 160', fill: 'none', ...OUT, 'stroke-width': 6 }, svg);
+S('rect', { y: 1150, width: W, height: 800, fill: '#e9bfd0' }, svg);
+set(couple(svg), { transform: 'translate(575 1010) scale(1.3)' });
+const trail = [0, 1, 2, 3].map((i) => S('circle', { r: 50, fill: 'none', stroke: '#ffd23f', 'stroke-width': 16, opacity: 0.1 + i * 0.08 }, svg));
+const ringO = S('circle', { r: 58, fill: 'none', stroke: INK, 'stroke-width': 30 }, svg);
+const ring = S('circle', { r: 58, fill: 'none', stroke: '#ffd23f', 'stroke-width': 18 }, svg);
+const gem = S('path', { d: 'M-22 0 L0 -30 L22 0 L0 22 Z', fill: '#bfeaff', ...OUT, 'stroke-width': 5 }, svg);
+const D = makeChar('D', svg);
+const camG = S('g', {}, svg);
+set(camera(camG, 150), { transform: 'scale(1.5)' });
+const badge = S('g', {}, svg);
+const bbg = S('rect', { x: -230, y: -90, width: 460, height: 140, rx: 26, fill: '#e2483d', ...OUT, 'stroke-width': 12 }, badge);
+text(badge, '120 FPS', 0, 22, 116, '#fff');
+const slow = S('g', {}, svg);
+const letters = 'SUUUPER SLOOOW'.split('').map((ch, i) => text(slow, ch, 0, 0, 150, i < 7 ? '#fff' : '#ffd23f'));
+window.film = { duration: 4.9, ready: fontReady(), frame(t) {
+  const r = R0 + t, m = talk(r);
+  const x = 560 + Math.sin(t * 0.25) * 20, y = lerp(470, 560, t / 4.9);
+  set(ring, { cx: x, cy: y }); set(ringO, { cx: x, cy: y });
+  set(gem, { transform: `translate(${x} ${y - 70})` });
+  trail.forEach((c, i) => set(c, { cx: x - 6 * (4 - i), cy: y - (4 - i) * 26 }));
+  D.pose({ x: 250, y: 1540, s: 1.05, mouth: m, bob: m * 12, look: [0.8, -0.5], blink: blinkAt(t, 0.3), brow: 1, smile: 1, tilt: -6 + Math.sin(t * 2) * 2 });
+  set(camG, { transform: `translate(430 1660) rotate(-38)` });
+  const on = (t * 2.5) % 1 < 0.6;
+  set(badge, { transform: `translate(790 1530) rotate(6) scale(${outBack(ramp(t, 0.3, 0.6))})` });
+  set(bbg, { fill: on ? '#e2483d' : '#8f2a24' });
+  letters.forEach((el, i) => {
+    const a = ramp(r, 195.5 + i * 0.09, 195.75 + i * 0.09);
+    set(el, { x: 90 + i * 69, y: 1210 + Math.sin(t * 2 + i * 0.5) * 18, opacity: a, transform: `rotate(${Math.sin(t * 1.5 + i) * 4} ${90 + i * 69} 1210)` });
+  });
+} };
+</script>

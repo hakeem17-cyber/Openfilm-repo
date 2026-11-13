@@ -1,0 +1,12 @@
+<!doctype html><meta charset="utf-8">
+<script type="module">
+// The line over clip 3's hook.
+import { stage, S, set, text, OUT, outBack, ramp, fontReady } from './toon.js';
+const svg = stage(null), g = S('g', {}, svg);
+S('rect', { x: -490, y: -120, width: 980, height: 290, rx: 34, fill: '#e2483d', ...OUT, 'stroke-width': 12 }, g);
+text(g, 'I SHOT EVERYTHING', 0, 0, 92, '#fff');
+text(g, 'IN SLOW-MO...', 0, 118, 112, '#ffd23f');
+window.film = { duration: 3.05, ready: fontReady(), frame(t) {
+  set(g, { transform: `translate(540 330) rotate(-3) scale(${outBack(ramp(t, 0.03, 0.3))})` });
+} };
+</script>

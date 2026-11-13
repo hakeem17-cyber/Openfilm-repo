@@ -1,0 +1,37 @@
+<!doctype html><meta charset="utf-8">
+<script type="module">
+// "The cut is very mysterious… with your voiceover… dah macam drama."
+import { stage, S, set, text, outBack, ease, ramp, amp, rnd, fontReady, W, H } from './toon.js';
+import { couple } from './props.js';
+const R0 = 73.6;
+const svg = stage('#0d1b26');
+const defs = S('defs', {}, svg);
+const gr = S('radialGradient', { id: 'glow' }, defs);
+S('stop', { offset: 0, 'stop-color': '#7fd0d6', 'stop-opacity': .9 }, gr); S('stop', { offset: 1, 'stop-color': '#0d1b26', 'stop-opacity': 0 }, gr);
+const world = S('g', {}, svg);
+S('ellipse', { cx: 540, cy: 900, rx: 640, ry: 560, fill: 'url(#glow)' }, world);
+S('rect', { y: 1190, width: W, height: 730, fill: '#081218' }, world);
+set(couple(world, '#050a0e'), { transform: 'translate(555 1200) scale(1.6)' });
+const fog = [];
+for (let i = 0; i < 7; i++) fog.push(S('ellipse', { cy: 1050 + rnd(i) * 260, rx: 330 + rnd(i + 9) * 200, ry: 60 + rnd(i + 4) * 40, fill: '#bfe6e8', opacity: .16 }, world));
+S('rect', { width: W, height: 300, fill: '#000' }, svg); S('rect', { y: 1620, width: W, height: 300, fill: '#000' }, svg);
+const myst = text(svg, 'M Y S T E R I O U S . . .', 540, 520, 76, '#bfe6e8', { stroke: 'none', 'letter-spacing': 6 });
+const vo = S('g', {}, svg), bars = [];
+for (let i = 0; i < 31; i++) bars.push(S('rect', { x: 150 + i * 26, width: 14, rx: 7, fill: '#ffd23f' }, vo));
+const voT = text(svg, 'VOICEOVER', 540, 1590, 54, '#ffd23f', { stroke: 'none' });
+const drama = S('g', {}, svg);
+text(drama, 'DRAMA', 0, 0, 330, '#e2483d', { stroke: '#fff', 'stroke-width': 18 });
+const serius = text(svg, 'SERIUS.', 540, 1130, 120, '#fff');
+window.film = { duration: 5.8, ready: fontReady(), frame(t) {
+  const r = R0 + t;
+  set(world, { transform: `translate(${540 - 540 * (1 + t * 0.02)} ${960 - 960 * (1 + t * 0.02)}) scale(${1 + t * 0.02})` });
+  fog.forEach((f, i) => set(f, { cx: ((i * 260 + t * (30 + i * 9)) % 1700) - 300 }));
+  myst.style.opacity = ramp(t, 0.1, 0.8) * (1 - ramp(r, 77.3, 77.6));
+  const von = ramp(r, 75.1, 75.4) * (1 - ramp(r, 77.3, 77.6));
+  vo.style.opacity = voT.style.opacity = von;
+  bars.forEach((b, i) => { const h = 16 + amp(r - Math.abs(i - 15) * 0.03) * 200 * (0.5 + rnd(i) * 0.5); set(b, { y: 1440 - h / 2, height: h }); });
+  const k = ramp(r, 77.7, 77.95);
+  set(drama, { transform: `translate(540 1010) rotate(-6) scale(${k ? 2.6 - 1.6 * ease(k) : 0})` });
+  serius.style.display = r > 78.9 ? '' : 'none';
+} };
+</script>
